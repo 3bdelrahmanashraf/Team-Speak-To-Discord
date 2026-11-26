@@ -7,7 +7,7 @@
 [![Discord.js](https://img.shields.io/badge/Discord.js-14+-5865F2?logo=discord&logoColor=white)](https://discord.js.org/)
 [![TeamSpeak](https://img.shields.io/badge/TeamSpeak-3%2F5-0099E1?logo=teamspeak&logoColor=white)](https://teamspeak.com/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/3bdelrahmanashraf/Team-Speak-To-Discord/ci.yml?branch=main)](https://github.com/3bdelrahmanashraf/Team-Speak-To-Discord/actions)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/3bdelrahmanashraf/Team-Speak-To-Discord/ci.yml?branch=master)](https://github.com/3bdelrahmanashraf/Team-Speak-To-Discord/actions)
 [![Code Style](https://img.shields.io/badge/Code%20Style-Biome-60A5FA?logo=biome&logoColor=white)](https://biomejs.dev/)
 
 ---
