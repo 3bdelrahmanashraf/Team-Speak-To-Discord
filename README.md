@@ -58,21 +58,39 @@
 
 ### Overall Status
 
-| Phase | Name | Progress | Tasks | Status |
-|-------|------|----------|-------|--------|
-| **0** | Foundation & Setup | `████████████████████` **100%** | 8/8 | ✅ **COMPLETE** |
-| **1** | TeamSpeak Integration | `░░░░░░░░░░░░░░░░░░░░` **0%** | 0/7 | ⏳ Planned |
-| **2** | Discord Integration | `░░░░░░░░░░░░░░░░░░░░` **0%** | 0/6 | ⏳ Planned |
-| **3** | Audio Pipeline | `░░░░░░░░░░░░░░░░░░░░` **0%** | 0/7 | ⏳ Planned |
-| **4** | Chat Synchronization | `░░░░░░░░░░░░░░░░░░░░` **0%** | 0/6 | ⏳ Planned |
-| **5** | User & Permission Mgmt | `░░░░░░░░░░░░░░░░░░░░` **0%** | 0/7 | ⏳ Planned |
-| **6** | Web Dashboard | `░░░░░░░░░░░░░░░░░░░░` **0%** | 0/6 | ⏳ Planned |
-| **7** | Advanced Features | `░░░░░░░░░░░░░░░░░░░░` **0%** | 0/6 | ⏳ Planned |
-| **8** | Polish & Release | `░░░░░░░░░░░░░░░░░░░░` **0%** | 0/6 | ⏳ Planned |
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  PHASE 0  ████████████████████████████████████████  100%  8/8  ✅ COMPLETE   │
+│  PHASE 1  ████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0%    0/7  ⏳ PLANNED    │
+│  PHASE 2  ████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0%    0/6  ⏳ PLANNED    │
+│  PHASE 3  ████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0%    0/7  ⏳ PLANNED    │
+│  PHASE 4  ████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0%    0/6  ⏳ PLANNED    │
+│  PHASE 5  ████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0%    0/7  ⏳ PLANNED    │
+│  PHASE 6  ████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0%    0/6  ⏳ PLANNED    │
+│  PHASE 7  ████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0%    0/6  ⏳ PLANNED    │
+│  PHASE 8  ████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0%    0/6  ⏳ PLANNED    │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
 
-**Overall:** `████████░░░░░░░░░░░░░░░░░░░░` **11%** (8/53 tasks)
+**Overall Progress:** ████████░░░░░░░░░░░░░░░░░░░░  **11%**  (8/53 tasks complete)
 
-### Phase Breakdown
+### Phase Summary Cards
+
+| Phase | Title | Status | Progress | Tasks | Milestone |
+|-------|-------|--------|----------|-------|-----------|
+| **0** | Foundation & Setup | ✅ **Complete** | ████████████████████ 100% | 8/8 | Project scaffolding, CI/CD, Docker, Config |
+| **1** | TeamSpeak Integration | ⏳ **Planned** | ████░░░░░░░░░░░░░░░░░░░ 0% | 0/7 | TS3 Query, TS5 WS, Events, Channels, Users |
+| **2** | Discord Integration | ⏳ **Planned** | ████░░░░░░░░░░░░░░░░░░░ 0% | 0/6 | Bot, Slash Commands, Voice, Sync, Threads |
+| **3** | Audio Pipeline | ⏳ **Planned** | ████░░░░░░░░░░░░░░░░░░░ 0% | 0/7 | Opus, VAD, Noise Suppression, Mixing, Jitter |
+| **4** | Chat Synchronization | ⏳ **Planned** | ████░░░░░░░░░░░░░░░░░░░ 0% | 0/6 | Relay, Formatting, Embeds, Edit/Delete, Commands |
+| **5** | User & Permissions | ⏳ **Planned** | ████░░░░░░░░░░░░░░░░░░░ 0% | 0/7 | Identity Link, Role Map, Sync, Nick/Avatar/Presence |
+| **6** | Web Dashboard | ⏳ **Planned** | ████░░░░░░░░░░░░░░░░░░░ 0% | 0/6 | Auth, Metrics, Config UI, Audit, Channel Map |
+| **7** | Advanced Features | ⏳ **Planned** | ████░░░░░░░░░░░░░░░░░░░ 0% | 0/6 | Multi-Server, Clustering, Plugins, WebRTC, AI |
+| **8** | Polish & Release | ⏳ **Planned** | ████░░░░░░░░░░░░░░░░░░░ 0% | 0/6 | Docs, Wizard, Migration, Benchmarks, Security |
+
+---
+
+### Detailed Phase Breakdown
 
 <details>
 <summary><b>Phase 0: Foundation & Setup</b> <span style="color:#10b981">✓ COMPLETE</span></summary>
