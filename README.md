@@ -58,42 +58,25 @@
 
 ### Overall Status
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│  PHASE 0  ████████████████████████████████████████  100%  8/8  ✅ COMPLETE   │
-│  PHASE 1  ████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0%    0/7  ⏳ PLANNED    │
-│  PHASE 2  ████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0%    0/6  ⏳ PLANNED    │
-│  PHASE 3  ████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0%    0/7  ⏳ PLANNED    │
-│  PHASE 4  ████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0%    0/6  ⏳ PLANNED    │
-│  PHASE 5  ████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0%    0/7  ⏳ PLANNED    │
-│  PHASE 6  ████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0%    0/6  ⏳ PLANNED    │
-│  PHASE 7  ████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0%    0/6  ⏳ PLANNED    │
-│  PHASE 8  ████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0%    0/6  ⏳ PLANNED    │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
+| Phase | Name | Progress | Tasks | Status |
+|-------|------|----------|-------|--------|
+| **0** | Foundation & Setup | `▰▰▰▰▰▰▰▰▰▰` **100%** | 8/8 | ✅ **COMPLETE** |
+| **1** | TeamSpeak Integration | `▱▱▱▱▱▱▱▱▱▱` **0%** | 0/7 | ⏳ Planned |
+| **2** | Discord Integration | `▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
+| **3** | Audio Pipeline | `▱▱▱▱▱▱▱▱▱▱` **0%** | 0/7 | ⏳ Planned |
+| **4** | Chat Synchronization | `▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
+| **5** | User & Permission Mgmt | `▱▱▱▱▱▱▱▱▱▱` **0%** | 0/7 | ⏳ Planned |
+| **6** | Web Dashboard | `▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
+| **7** | Advanced Features | `▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
+| **8** | Polish & Release | `▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
 
-**Overall Progress:** ████████░░░░░░░░░░░░░░░░░░░░  **11%**  (8/53 tasks complete)
-
-### Phase Summary Cards
-
-| Phase | Title | Status | Progress | Tasks | Milestone |
-|-------|-------|--------|----------|-------|-----------|
-| **0** | Foundation & Setup | ✅ **Complete** | ████████████████████ 100% | 8/8 | Project scaffolding, CI/CD, Docker, Config |
-| **1** | TeamSpeak Integration | ⏳ **Planned** | ████░░░░░░░░░░░░░░░░░░░ 0% | 0/7 | TS3 Query, TS5 WS, Events, Channels, Users |
-| **2** | Discord Integration | ⏳ **Planned** | ████░░░░░░░░░░░░░░░░░░░ 0% | 0/6 | Bot, Slash Commands, Voice, Sync, Threads |
-| **3** | Audio Pipeline | ⏳ **Planned** | ████░░░░░░░░░░░░░░░░░░░ 0% | 0/7 | Opus, VAD, Noise Suppression, Mixing, Jitter |
-| **4** | Chat Synchronization | ⏳ **Planned** | ████░░░░░░░░░░░░░░░░░░░ 0% | 0/6 | Relay, Formatting, Embeds, Edit/Delete, Commands |
-| **5** | User & Permissions | ⏳ **Planned** | ████░░░░░░░░░░░░░░░░░░░ 0% | 0/7 | Identity Link, Role Map, Sync, Nick/Avatar/Presence |
-| **6** | Web Dashboard | ⏳ **Planned** | ████░░░░░░░░░░░░░░░░░░░ 0% | 0/6 | Auth, Metrics, Config UI, Audit, Channel Map |
-| **7** | Advanced Features | ⏳ **Planned** | ████░░░░░░░░░░░░░░░░░░░ 0% | 0/6 | Multi-Server, Clustering, Plugins, WebRTC, AI |
-| **8** | Polish & Release | ⏳ **Planned** | ████░░░░░░░░░░░░░░░░░░░ 0% | 0/6 | Docs, Wizard, Migration, Benchmarks, Security |
+**Overall:** `▰▰▰▰▰▰▰▰▱▱▱▱▱▱▱▱▱▱▱▱` **11%** (8/53 tasks)
 
 ---
 
-### Detailed Phase Breakdown
+## Phase Breakdown
 
-<details>
-<summary><b>Phase 0: Foundation & Setup</b> <span style="color:#10b981">✓ COMPLETE</span></summary>
+### Phase 0: Foundation & Setup  ✅ **COMPLETE**
 
 | Task | Status |
 |------|--------|
@@ -106,10 +89,9 @@
 | Logging infrastructure (Pino) | ✅ Done |
 | Error handling & monitoring (Sentry-ready) | ✅ Done |
 
-</details>
+---
 
-<details>
-<summary><b>Phase 1: TeamSpeak Integration</b> <span style="color:#f59e0b">⏳ PLANNED</span></summary>
+### Phase 1: TeamSpeak Integration  ⏳ **Planned**
 
 | Task | Status |
 |------|--------|
@@ -121,10 +103,9 @@
 | File Transfer - Handle TeamSpeak file transfers | ⏳ Pending |
 | Permission System - Server group / channel group mapping | ⏳ Pending |
 
-</details>
+---
 
-<details>
-<summary><b>Phase 2: Discord Integration</b> <span style="color:#f59e0b">⏳ PLANNED</span></summary>
+### Phase 2: Discord Integration  ⏳ **Planned**
 
 | Task | Status |
 |------|--------|
@@ -136,10 +117,9 @@
 | Reaction Roles - Discord reactions → TS server groups | ⏳ Pending |
 | Rich Presence - Show TS status in Discord profile | ⏳ Pending |
 
-</details>
+---
 
-<details>
-<summary><b>Phase 3: Audio Pipeline</b> <span style="color:#f59e0b">⏳ PLANNED</span></summary>
+### Phase 3: Audio Pipeline  ⏳ **Planned**
 
 | Task | Status |
 |------|--------|
@@ -151,10 +131,9 @@
 | Jitter Buffer - Smooth playback under network variance | ⏳ Pending |
 | Recording - Optional session recording to disk | ⏳ Pending |
 
-</details>
+---
 
-<details>
-<summary><b>Phase 4: Chat Synchronization</b> <span style="color:#f59e0b">⏳ PLANNED</span></summary>
+### Phase 4: Chat Synchronization  ⏳ **Planned**
 
 | Task | Status |
 |------|--------|
@@ -165,10 +144,9 @@
 | Mention Mapping - @user in Discord → poke in TS | ⏳ Pending |
 | Command Bridge - Execute TS commands from Discord & vice versa | ⏳ Pending |
 
-</details>
+---
 
-<details>
-<summary><b>Phase 5: User & Permission Management</b> <span style="color:#f59e0b">⏳ PLANNED</span></summary>
+### Phase 5: User & Permission Management  ⏳ **Planned**
 
 | Task | Status |
 |------|--------|
@@ -180,10 +158,9 @@
 | Presence Sync - Online/away/dnd status | ⏳ Pending |
 | Ban/Kick Sync - Cross-platform moderation | ⏳ Pending |
 
-</details>
+---
 
-<details>
-<summary><b>Phase 6: Web Dashboard</b> <span style="color:#f59e0b">⏳ PLANNED</span></summary>
+### Phase 6: Web Dashboard  ⏳ **Planned**
 
 | Task | Status |
 |------|--------|
@@ -194,10 +171,9 @@
 | User Management - Link/unlink accounts, view stats | ⏳ Pending |
 | Channel Mapping - Drag-drop TS↔Discord channel mapping | ⏳ Pending |
 
-</details>
+---
 
-<details>
-<summary><b>Phase 7: Advanced Features</b> <span style="color:#f59e0b">⏳ PLANNED</span></summary>
+### Phase 7: Advanced Features  ⏳ **Planned**
 
 | Task | Status |
 |------|--------|
@@ -208,10 +184,9 @@
 | Mobile App Companion - React Native control app | ⏳ Pending |
 | AI Moderation - Toxicity detection, auto-moderation | ⏳ Pending |
 
-</details>
+---
 
-<details>
-<summary><b>Phase 8: Polish & Release</b> <span style="color:#f59e0b">⏳ PLANNED</span></summary>
+### Phase 8: Polish & Release  ⏳ **Planned**
 
 | Task | Status |
 |------|--------|
@@ -221,8 +196,6 @@
 | Performance Benchmarks - Latency, CPU, memory targets | ⏳ Pending |
 | Security Audit - Dependency scan, penetration test | ⏳ Pending |
 | v1.0 Release - Stable production release | ⏳ Pending |
-
-</details>
 
 ---
 
