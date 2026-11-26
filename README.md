@@ -54,6 +54,79 @@
 
 ---
 
+## Integration Features
+
+The bridge creates a seamless connection between TeamSpeak and Discord through two primary shared channels:
+
+### Shared Voice Channel
+- **Bidirectional Audio Streaming** — Real-time Opus audio flows both directions
+- **Multiple TS Clients → Single Discord Stream** — All TeamSpeak users in the linked channel are mixed into one Discord voice channel
+- **Voice Activity Detection** — Silero VAD prevents silence transmission
+- **Noise Suppression** — RNNoise/WebRTC integration for cleaner audio
+- **Adaptive Bitrate** — Quality adjusts dynamically based on network conditions
+- **Low Latency** — Target <100ms end-to-end latency
+
+### Shared Text Channel
+- **Bidirectional Message Sync** — Messages appear instantly on both platforms
+- **Rich Formatting** — Markdown ↔ TeamSpeak BBCode conversion
+- **Embed Support** — Links, images, files rendered as Discord embeds
+- **Edit/Delete Sync** — Message modifications stay in sync
+- **Mention Mapping** — `@user` in Discord triggers TeamSpeak poke
+- **Thread Mapping** — TeamSpeak channels map to Discord threads for organization
+
+---
+
+## Web Control Panel
+
+A dedicated web-based administration panel provides full configuration without editing files:
+
+| Feature | Description |
+|---------|-------------|
+| **Authentication** | Discord OAuth2 + TeamSpeak admin token |
+| **Channel Mapping** | Visual drag-and-drop TS ↔ Discord channel linking |
+| **User Management** | Link/unlink accounts, view connection stats |
+| **Role Mapping** | Map TeamSpeak server groups to Discord roles |
+| **Real-time Metrics** | Live audio quality, latency, connected users |
+| **Audit Logs** | Searchable history of all administrative actions |
+| **Configuration UI** | Visual bridge settings (no file editing needed) |
+| **Alerts** | Discord webhook notifications for issues |
+
+**Access:** Available at `http://localhost:3000` (configurable via `WEB_DASHBOARD_PORT`)
+
+---
+
+## Why Docker?
+
+Docker is the recommended deployment method for several key reasons:
+
+| Benefit | Description |
+|---------|-------------|
+| **Consistency** | Identical environment across dev, staging, and production |
+| **Dependency Isolation** | Node.js, Opus, FFmpeg, and system libs bundled — no host conflicts |
+| **Easy Updates** | Pull new image, restart container — zero-downtime deployments |
+| **Resource Limits** | CPU/memory caps prevent runaway processes |
+| **Multi-service** | PostgreSQL, Redis, and bridge in one `docker-compose.yml` |
+| **Portability** | Runs on any Linux server, VPS, or cloud provider |
+| **Health Checks** | Built-in container health monitoring with auto-restart |
+| **Security** | Non-root user, read-only filesystem options, capability dropping |
+
+**Quick Start with Docker:**
+```bash
+# Clone and configure
+git clone https://github.com/3bdelrahmanashraf/Team-Speak-To-Discord.git
+cd Team-Speak-To-Discord
+cp config/example.env .env
+# Edit .env with your credentials
+
+# Deploy
+docker compose up -d --build
+
+# View logs
+docker compose logs -f bridge
+```
+
+---
+
 ## Development Progress
 
 ### Overall Status
