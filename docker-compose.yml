@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  bridge:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: teamspeak-discord-bridge
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    networks:
+      - bridge-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (r) => { if (r.statusCode !== 200) process.exit(1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+
+  redis:
+    image: redis:7-alpine
+    container_name: teamspeak-discord-redis
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    networks:
+      - bridge-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: teamspeak-discord-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: bridge
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-bridge_secure_password}
+      POSTGRES_DB: teamspeak_discord_bridge
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - bridge-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bridge -d teamspeak_discord_bridge"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  bridge-network:
+    driver: bridge
+    name: teamspeak-discord-network
+
+volumes:
+  redis-data:
+    driver: local
+  postgres-data:
+    driver: local

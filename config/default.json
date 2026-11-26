@@ -1,0 +1,93 @@
+{
+  "discord": {
+    "intents": [
+      "Guilds",
+      "GuildMembers",
+      "GuildVoiceStates",
+      "GuildMessages",
+      "MessageContent",
+      "GuildMessageReactions",
+      "DirectMessages",
+      "DirectMessageReactions"
+    ]
+  },
+  "teamspeak": {
+    "queryPort": 10011,
+    "serverId": 1,
+    "nickname": "Discord Bridge",
+    "useTS5": false,
+    "reconnectInterval": 5000,
+    "maxReconnectAttempts": 10
+  },
+  "audio": {
+    "quality": "high",
+    "bitrate": 64000,
+    "sampleRate": 48000,
+    "channels": 1,
+    "frameSize": 960,
+    "vadEnabled": true,
+    "vadThreshold": 0.5,
+    "noiseSuppressionEnabled": true,
+    "noiseSuppressionLevel": 2,
+    "jitterBufferMs": 100,
+    "adaptiveBitrate": true,
+    "opusApplication": "voip"
+  },
+  "chat": {
+    "syncEnabled": true,
+    "syncInterval": 1000,
+    "maxMessageLength": 2000,
+    "embedLinks": true,
+    "embedImages": true,
+    "showTimestamps": true,
+    "showUserBadges": true,
+    "threadMapping": true,
+    "mentionMapping": true,
+    "commandPrefix": "!",
+    "ignoredChannels": []
+  },
+  "user": {
+    "linkEnabled": true,
+    "nicknameSync": true,
+    "avatarSync": false,
+    "roleMapping": {
+      "Server Admin": "Admin",
+      "Moderator": "Mod"
+    },
+    "permissionSync": true,
+    "presenceSync": true,
+    "banSync": true,
+    "kickSync": true
+  },
+  "bridge": {
+    "logLevel": "info",
+    "syncInterval": 5000,
+    "healthCheckInterval": 30000,
+    "maxConcurrentUsers": 100,
+    "rateLimit": {
+      "windowMs": 60000,
+      "maxRequests": 100
+    },
+    "encryption": {
+      "enabled": true,
+      "key": null
+    }
+  },
+  "database": {
+    "url": "postgresql://bridge:password@localhost:5432/teamspeak_discord_bridge",
+    "poolSize": 10,
+    "ssl": false
+  },
+  "redis": {
+    "url": "redis://localhost:6379",
+    "keyPrefix": "tsdc:",
+    "connectionTimeout": 10000
+  },
+  "webDashboard": {
+    "enabled": true,
+    "port": 3000,
+    "host": "0.0.0.0",
+    "corsOrigins": ["http://localhost:3000"]
+  },
+  "environment": "development"
+}
