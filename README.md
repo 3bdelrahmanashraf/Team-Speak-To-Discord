@@ -1,4 +1,4 @@
-# Team Speak To Discord 🎮🔊
+# Team Speak To Discord
 
 > A high-performance, feature-rich bridge that seamlessly connects **TeamSpeak 3/5** with **Discord**, enabling bidirectional audio streaming, text chat synchronization, and advanced community management features.
 
@@ -12,24 +12,24 @@
 
 ---
 
-## 🌟 Overview
+## Overview
 
 **Team Speak To Discord** is a modern, TypeScript-based bridge that connects TeamSpeak servers with Discord communities. Built upon the foundations of [teamspeak-discord-bridge](https://github.com/c-wagner/teamspeak-discord-bridge) and inspired by [TeamCord](https://github.com/Kleinrotti/TeamCord), this project takes the best ideas from both and adds significant enhancements for reliability, performance, and user experience.
 
-### ✨ Key Features
+### Key Features
 
 | Category | Features |
 |----------|----------|
-| **🎵 Audio** | Bidirectional Opus audio streaming, adaptive bitrate, noise suppression, voice activity detection |
-| **💬 Chat** | Bidirectional text sync, rich embeds, thread support, message editing/deletion sync |
-| **👥 Users** | Real-time user presence, role mapping, permission sync, nickname synchronization |
-| **🔧 Admin** | Web dashboard, audit logs, automated moderation, channel management |
-| **⚡ Performance** | Connection pooling, automatic reconnection, memory optimization, clustering support |
-| **🔒 Security** | Encrypted config, rate limiting, audit trails, permission-based commands |
+| **Audio** | Bidirectional Opus audio streaming, adaptive bitrate, noise suppression, voice activity detection |
+| **Chat** | Bidirectional text sync, rich embeds, thread support, message editing/deletion sync |
+| **Users** | Real-time user presence, role mapping, permission sync, nickname synchronization |
+| **Admin** | Web dashboard, audit logs, automated moderation, channel management |
+| **Performance** | Connection pooling, automatic reconnection, memory optimization, clustering support |
+| **Security** | Encrypted config, rate limiting, audit trails, permission-based commands |
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 ┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
@@ -54,92 +54,159 @@
 
 ---
 
-## 📋 Development Roadmap
+## Development Progress
 
-### Phase 0: Foundation & Setup ✅
-- [x] Project structure initialization
-- [x] TypeScript configuration with strict mode
-- [x] ESLint + Biome + Prettier setup
-- [x] GitHub Actions CI/CD pipeline
-- [x] Docker & Docker Compose configuration
-- [x] Environment configuration schema (Zod)
-- [x] Logging infrastructure (Pino)
-- [x] Error handling & monitoring (Sentry-ready)
+### Overall Status
 
-### Phase 1: TeamSpeak Integration 🔄
-- [ ] **TS3 Query Connection** - Stable TCP connection with auto-reconnect
-- [ ] **TS5 WebSocket Support** - Modern WebSocket-based connection
-- [ ] **Event System** - Comprehensive event handling (join, leave, talk, chat, etc.)
-- [ ] **Channel Management** - List, create, move, delete channels
-- [ ] **User Management** - Client info, groups, permissions, bans
-- [ ] **File Transfer** - Handle TeamSpeak file transfers
-- [ ] **Permission System** - Server group / channel group mapping
+```
+████████████████████████████████████████  Phase 0: Foundation & Setup        100%  [████████████████████]  8/8
+████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  Phase 1: TeamSpeak Integration       0%    [░░░░░░░░░░░░░░░░░░░░]  0/7
+████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  Phase 2: Discord Integration         0%    [░░░░░░░░░░░░░░░░░░░░]  0/6
+████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  Phase 3: Audio Pipeline              0%    [░░░░░░░░░░░░░░░░░░░░]  0/7
+████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  Phase 4: Chat Synchronization        0%    [░░░░░░░░░░░░░░░░░░░░]  0/6
+████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  Phase 5: User & Permission Mgmt      0%    [░░░░░░░░░░░░░░░░░░░░]  0/7
+████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  Phase 6: Web Dashboard               0%    [░░░░░░░░░░░░░░░░░░░░]  0/6
+████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  Phase 7: Advanced Features           0%    [░░░░░░░░░░░░░░░░░░░░]  0/6
+████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  Phase 8: Polish & Release            0%    [░░░░░░░░░░░░░░░░░░░░]  0/6
+```
 
-### Phase 2: Discord Integration 🔄
-- [ ] **Bot Setup** - Discord.js v14 with gateway intents
-- [ ] **Slash Commands** - Full command registration & handling
-- [ ] **Voice Connection** - Join/leave voice channels, Opus streaming
-- [ ] **Text Synchronization** - Bidirectional message relay with embeds
-- [ ] **Thread Support** - Map TS channels to Discord threads
-- [ ] **Reaction Roles** - Discord reactions → TS server groups
-- [ ] **Rich Presence** - Show TS status in Discord profile
+### Phase Breakdown
 
-### Phase 3: Audio Pipeline 🔄
-- [ ] **Opus Encoder/Decoder** - High-quality audio processing
-- [ ] **Voice Activity Detection** - Silero VAD integration
-- [ ] **Noise Suppression** - RNNoise / WebRTC NS integration
-- [ ] **Adaptive Bitrate** - Dynamic quality based on network
-- [ ] **Audio Mixing** - Multiple TS clients → single Discord stream
-- [ ] **Jitter Buffer** - Smooth playback under network variance
-- [ ] **Recording** - Optional session recording to disk
+<details>
+<summary><b>Phase 0: Foundation & Setup</b> <span style="color:#10b981">✓ COMPLETE</span></summary>
 
-### Phase 4: Chat Synchronization 🔄
-- [ ] **Message Relay** - TS chat ↔ Discord channels
-- [ ] **Rich Formatting** - Markdown ↔ TeamSpeak BBCode conversion
-- [ ] **Embed Support** - Links, images, files as Discord embeds
-- [ ] **Edit/Delete Sync** - Keep messages in sync across platforms
-- [ ] **Mention Mapping** - @user in Discord → poke in TS
-- [ ] **Command Bridge** - Execute TS commands from Discord & vice versa
-- [ ] **Message Threading** - Organize by TS channel
+| Task | Status |
+|------|--------|
+| Project structure initialization | ✅ Done |
+| TypeScript configuration with strict mode | ✅ Done |
+| ESLint + Biome + Prettier setup | ✅ Done |
+| GitHub Actions CI/CD pipeline | ✅ Done |
+| Docker & Docker Compose configuration | ✅ Done |
+| Environment configuration schema (Zod) | ✅ Done |
+| Logging infrastructure (Pino) | ✅ Done |
+| Error handling & monitoring (Sentry-ready) | ✅ Done |
 
-### Phase 5: User & Permission Management 🔄
-- [ ] **Identity Linking** - Link TS unique ID ↔ Discord ID
-- [ ] **Role Mapping** - TS server groups ↔ Discord roles
-- [ ] **Permission Sync** - Channel permissions bidirectional
-- [ ] **Nickname Sync** - TS nickname ↔ Discord display name
-- [ ] **Avatar Sync** - TS avatar → Discord (where possible)
-- [ ] **Presence Sync** - Online/away/dnd status
-- [ ] **Ban/Kick Sync** - Cross-platform moderation
+</details>
 
-### Phase 6: Web Dashboard 🔄
-- [ ] **Authentication** - Discord OAuth2 + TS admin token
-- [ ] **Real-time Metrics** - Connected users, audio quality, latency
-- [ ] **Configuration UI** - Visual bridge configuration
-- [ ] **Audit Logs** - Searchable action history
-- [ ] **User Management** - Link/unlink accounts, view stats
-- [ ] **Channel Mapping** - Drag-drop TS↔Discord channel mapping
-- [ ] **Alerts & Notifications** - Discord webhook alerts
+<details>
+<summary><b>Phase 1: TeamSpeak Integration</b> <span style="color:#f59e0b">⏳ PLANNED</span></summary>
 
-### Phase 7: Advanced Features 🔄
-- [ ] **Multi-Server Support** - Bridge multiple TS servers
-- [ ] **Clustering** - Horizontal scaling with Redis
-- [ ] **Plugin System** - Custom extensions via TypeScript
-- [ ] **WebRTC Fallback** - Browser-based audio for mobile
-- [ ] **Mobile App Companion** - React Native control app
-- [ ] **AI Moderation** - Toxicity detection, auto-moderation
-- [ ] **Analytics Export** - Prometheus/Grafana metrics
+| Task | Status |
+|------|--------|
+| TS3 Query Connection - Stable TCP with auto-reconnect | ⏳ Pending |
+| TS5 WebSocket Support - Modern WebSocket-based connection | ⏳ Pending |
+| Event System - Comprehensive event handling | ⏳ Pending |
+| Channel Management - List, create, move, delete | ⏳ Pending |
+| User Management - Client info, groups, permissions, bans | ⏳ Pending |
+| File Transfer - Handle TeamSpeak file transfers | ⏳ Pending |
+| Permission System - Server group / channel group mapping | ⏳ Pending |
 
-### Phase 8: Polish & Release 🔄
-- [ ] **Documentation** - Complete user & developer docs
-- [ ] **Installation Wizard** - Interactive setup CLI
-- [ ] **Migration Tool** - Import from teamspeak-discord-bridge / TeamCord
-- [ ] **Performance Benchmarks** - Latency, CPU, memory targets
-- [ ] **Security Audit** - Dependency scan, penetration test
-- [ ] **v1.0 Release** - Stable production release
+</details>
+
+<details>
+<summary><b>Phase 2: Discord Integration</b> <span style="color:#f59e0b">⏳ PLANNED</span></summary>
+
+| Task | Status |
+|------|--------|
+| Bot Setup - Discord.js v14 with gateway intents | ⏳ Pending |
+| Slash Commands - Full command registration & handling | ⏳ Pending |
+| Voice Connection - Join/leave voice channels, Opus streaming | ⏳ Pending |
+| Text Synchronization - Bidirectional message relay with embeds | ⏳ Pending |
+| Thread Support - Map TS channels to Discord threads | ⏳ Pending |
+| Reaction Roles - Discord reactions → TS server groups | ⏳ Pending |
+| Rich Presence - Show TS status in Discord profile | ⏳ Pending |
+
+</details>
+
+<details>
+<summary><b>Phase 3: Audio Pipeline</b> <span style="color:#f59e0b">⏳ PLANNED</span></summary>
+
+| Task | Status |
+|------|--------|
+| Opus Encoder/Decoder - High-quality audio processing | ⏳ Pending |
+| Voice Activity Detection - Silero VAD integration | ⏳ Pending |
+| Noise Suppression - RNNoise / WebRTC NS integration | ⏳ Pending |
+| Adaptive Bitrate - Dynamic quality based on network | ⏳ Pending |
+| Audio Mixing - Multiple TS clients → single Discord stream | ⏳ Pending |
+| Jitter Buffer - Smooth playback under network variance | ⏳ Pending |
+| Recording - Optional session recording to disk | ⏳ Pending |
+
+</details>
+
+<details>
+<summary><b>Phase 4: Chat Synchronization</b> <span style="color:#f59e0b">⏳ PLANNED</span></summary>
+
+| Task | Status |
+|------|--------|
+| Message Relay - TS chat ↔ Discord channels | ⏳ Pending |
+| Rich Formatting - Markdown ↔ TeamSpeak BBCode conversion | ⏳ Pending |
+| Embed Support - Links, images, files as Discord embeds | ⏳ Pending |
+| Edit/Delete Sync - Keep messages in sync across platforms | ⏳ Pending |
+| Mention Mapping - @user in Discord → poke in TS | ⏳ Pending |
+| Command Bridge - Execute TS commands from Discord & vice versa | ⏳ Pending |
+
+</details>
+
+<details>
+<summary><b>Phase 5: User & Permission Management</b> <span style="color:#f59e0b">⏳ PLANNED</span></summary>
+
+| Task | Status |
+|------|--------|
+| Identity Linking - Link TS unique ID ↔ Discord ID | ⏳ Pending |
+| Role Mapping - TS server groups ↔ Discord roles | ⏳ Pending |
+| Permission Sync - Channel permissions bidirectional | ⏳ Pending |
+| Nickname Sync - TS nickname ↔ Discord display name | ⏳ Pending |
+| Avatar Sync - TS avatar → Discord (where possible) | ⏳ Pending |
+| Presence Sync - Online/away/dnd status | ⏳ Pending |
+| Ban/Kick Sync - Cross-platform moderation | ⏳ Pending |
+
+</details>
+
+<details>
+<summary><b>Phase 6: Web Dashboard</b> <span style="color:#f59e0b">⏳ PLANNED</span></summary>
+
+| Task | Status |
+|------|--------|
+| Authentication - Discord OAuth2 + TS admin token | ⏳ Pending |
+| Real-time Metrics - Connected users, audio quality, latency | ⏳ Pending |
+| Configuration UI - Visual bridge configuration | ⏳ Pending |
+| Audit Logs - Searchable action history | ⏳ Pending |
+| User Management - Link/unlink accounts, view stats | ⏳ Pending |
+| Channel Mapping - Drag-drop TS↔Discord channel mapping | ⏳ Pending |
+
+</details>
+
+<details>
+<summary><b>Phase 7: Advanced Features</b> <span style="color:#f59e0b">⏳ PLANNED</span></summary>
+
+| Task | Status |
+|------|--------|
+| Multi-Server Support - Bridge multiple TS servers | ⏳ Pending |
+| Clustering - Horizontal scaling with Redis | ⏳ Pending |
+| Plugin System - Custom extensions via TypeScript | ⏳ Pending |
+| WebRTC Fallback - Browser-based audio for mobile | ⏳ Pending |
+| Mobile App Companion - React Native control app | ⏳ Pending |
+| AI Moderation - Toxicity detection, auto-moderation | ⏳ Pending |
+
+</details>
+
+<details>
+<summary><b>Phase 8: Polish & Release</b> <span style="color:#f59e0b">⏳ PLANNED</span></summary>
+
+| Task | Status |
+|------|--------|
+| Documentation - Complete user & developer docs | ⏳ Pending |
+| Installation Wizard - Interactive setup CLI | ⏳ Pending |
+| Migration Tool - Import from teamspeak-discord-bridge / TeamCord | ⏳ Pending |
+| Performance Benchmarks - Latency, CPU, memory targets | ⏳ Pending |
+| Security Audit - Dependency scan, penetration test | ⏳ Pending |
+| v1.0 Release - Stable production release | ⏳ Pending |
+
+</details>
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - **Node.js** 20+ (LTS recommended)
@@ -251,7 +318,7 @@ Team-Speak-To-Discord/
 
 ---
 
-## 🔧 Development
+## Development
 
 ### Commands
 
@@ -328,7 +395,7 @@ docker compose pull && docker compose up -d
 
 ---
 
-## 📊 Monitoring & Metrics
+## Monitoring & Metrics
 
 The bridge exposes metrics at `/metrics` (Prometheus format):
 
@@ -341,7 +408,7 @@ The bridge exposes metrics at `/metrics` (Prometheus format):
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
@@ -366,13 +433,13 @@ test: add integration tests for user linking
 
 ---
 
-## 📜 License
+## License
 
 MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **[teamspeak-discord-bridge](https://github.com/c-wagner/teamspeak-discord-bridge)** - Core bridge architecture inspiration
 - **[TeamCord](https://github.com/Kleinrotti/TeamCord)** - Client-side integration reference
@@ -383,7 +450,7 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-## 📞 Support
+## Support
 
 - **Issues**: [GitHub Issues](https://github.com/3bdelrahmanashraf/Team-Speak-To-Discord/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/3bdelrahmanashraf/Team-Speak-To-Discord/discussions)
@@ -392,5 +459,5 @@ MIT License - see [LICENSE](LICENSE) for details.
 ---
 
 <div align="center">
-  <sub>Built with ❤️ by <a href="https://github.com/3bdelrahmanashraf">3bdelrahmanashraf</a> and contributors</sub>
+  <sub>Built by <a href="https://github.com/3bdelrahmanashraf">3bdelrahmanashraf</a></sub>
 </div>
