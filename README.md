@@ -524,10 +524,3 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 - **Issues**: [GitHub Issues](https://github.com/3bdelrahmanashraf/Team-Speak-To-Discord/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/3bdelrahmanashraf/Team-Speak-To-Discord/discussions)
-- **Discord**: [Community Server](https://discord.gg/teamspeak-discord-bridge)
-
----
-
-<div align="center">
-  <sub>Built by <a href="https://github.com/3bdelrahmanashraf">3bdelrahmanashraf</a></sub>
-</div>
