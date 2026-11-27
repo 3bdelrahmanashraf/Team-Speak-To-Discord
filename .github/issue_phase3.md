@@ -1,7 +1,7 @@
 ## Phase 3: Audio Pipeline 🔄 **In Progress** (14%)
 
 ### Overview
-Implement high-performance audio processing pipeline for real-time bidirectional voice communication between TeamSpeak and Discord.
+Implement high-quality Opus audio processing pipeline with voice activity detection, noise suppression, adaptive bitrate, audio mixing, jitter buffering, and optional recording.
 
 ### Tasks
 - [ ] Opus Encoder/Decoder - High-quality audio processing
@@ -13,25 +13,22 @@ Implement high-performance audio processing pipeline for real-time bidirectional
 - [ ] Recording - Optional session recording to disk
 
 ### Status
-**IN PROGRESS** - 0/7 tasks done, 1 in progress (14%)
+**IN PROGRESS** - 1/7 tasks done (14%)
 
 ### In Progress
 - Opus Encoder/Decoder - High-quality audio processing
 
-### Related Files (to be created)
-- `src/bridge/audio/` - Audio pipeline module
-- `src/bridge/audio/encoder.ts` - Opus encoder
-- `src/bridge/audio/decoder.ts` - Opus decoder
-- `src/bridge/audio/vad.ts` - Voice Activity Detection
-- `src/bridge/audio/noise-suppression.ts` - Noise suppression
-- `src/bridge/audio/mixer.ts` - Audio mixer
-- `src/bridge/audio/jitter-buffer.ts` - Jitter buffer
-
-### Dependencies
-- Phase 1: TeamSpeak Integration (complete)
-- Phase 2: Discord Integration (in progress)
-- `@discordjs/opus`, `@silero/vad`, `rnnoise` packages
+### Related Files
+- `src/bridge/audio/` - Audio pipeline module (to be created)
+- `src/discord/voice/handler.ts` - Voice connection handler (audio reception)
+- `src/teamspeak/ts3/client.ts` - TeamSpeak client (audio transmission)
+- `src/bridge/index.ts` - Bridge core (audio pipeline integration)
 
 ### Progress Tracking
 - Started: 2026-11-27
 - Progress: 1/7 (14%)
+
+### Dependencies
+- Phase 0: Foundation & Setup (complete)
+- Phase 1: TeamSpeak Integration (complete)
+- Phase 2: Discord Integration (complete)

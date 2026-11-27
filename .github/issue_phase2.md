@@ -1,4 +1,4 @@
-## Phase 2: Discord Integration 🔄 **In Progress** (71%)
+## Phase 2: Discord Integration ✅ **COMPLETE** (100%)
 
 ### Overview
 Implement Discord.js v14 bot with gateway intents, slash commands, voice connections, and text synchronization.
@@ -9,11 +9,11 @@ Implement Discord.js v14 bot with gateway intents, slash commands, voice connect
 - [x] Voice Connection - Join/leave voice channels, Opus streaming
 - [x] Text Synchronization - Bidirectional message relay with embeds
 - [x] Thread Support - Map TS channels to Discord threads
-- [ ] Reaction Roles - Discord reactions → TS server groups
-- [ ] Rich Presence - Show TS status in Discord profile
+- [x] Reaction Roles - Discord reactions → TS server groups
+- [x] Rich Presence - Show TS status in Discord profile
 
 ### Status
-**IN PROGRESS** - 5/7 tasks done (71%)
+**COMPLETE** - 7/7 tasks done (100%)
 
 ### Completed
 - Discord.js v14 Client with all required intents (`src/discord/client.ts`)
@@ -35,10 +35,17 @@ Implement Discord.js v14 bot with gateway intents, slash commands, voice connect
   - List all thread mappings
   - Sync existing threads for a TS channel
   - Thread event handling in bridge core
-
-### In Progress
-- Reaction Roles - Discord reactions → TS server groups (command implemented, bridge integration pending)
-- Rich Presence - Show TS status in Discord profile (methods implemented, bridge integration pending)
+- **Reaction Roles** (`src/discord/commands/reactionrole.ts`) - Reaction role management
+  - Add/remove reaction role mappings (Discord emoji → TS server group)
+  - List all reaction role mappings
+  - Sync reaction roles for a message
+  - Event handling in Discord client and bridge core
+  - Automatic TS server group assignment/removal on reaction add/remove
+- **Rich Presence** (`src/discord/client.ts`) - Discord Rich Presence integration
+  - Update presence with bridge status, user counts, channel counts
+  - Multiple activity types (Watching, Listening)
+  - Enable/disable Rich Presence
+  - Automatic updates on bridge state changes
 
 ### Related Files
 - `src/discord/client.ts` - Discord.js v14 client with Rich Presence & Reaction Role methods
@@ -53,7 +60,8 @@ Implement Discord.js v14 bot with gateway intents, slash commands, voice connect
 
 ### Progress Tracking
 - Started: 2026-11-27
-- Progress: 5/7 (71%)
+- Completed: 2026-11-27
+- Progress: 7/7 (100%)
 
 ### Dependencies
 - Phase 0: Foundation & Setup (complete)

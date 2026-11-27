@@ -9,6 +9,8 @@ import { createLogger } from '../shared/utils/logger.js';
 import { BridgeState, BridgeEvents, TSClient, TSChannel, DiscordVoiceState, UserLink, ChannelMapping, DiscordMessage } from '../shared/types/index.js';
 import { BridgeError, ConnectionError, TeamSpeakError, DiscordError } from '../shared/utils/errors.js';
 import { ChatSync } from './chat/index.js';
+import { createTS3Client, TS3QueryClient } from '../teamspeak/ts3/client.js';
+import { createDiscordClient, DiscordClient } from '../discord/client.js';
 
 const logger = createLogger('bridge:core');
 
@@ -21,8 +23,8 @@ export class BridgeCore extends EventEmitter {
   private healthCheckTimer: ReturnType<typeof setTimeout> | null = null;
 
   // Component references (to be initialized)
-  private teamspeakClient: unknown = null;
-  private discordClient: unknown = null;
+  private teamspeakClient: TS3QueryClient | null = null;
+  private discordClient: DiscordClient | null = null;
   private audioPipeline: unknown = null;
   private chatSync: ChatSync | null = null;
   private userManager: unknown = null;
@@ -32,6 +34,13 @@ export class BridgeCore extends EventEmitter {
   private connectedDiscordUsers: Map<string, DiscordVoiceState> = new Map();
   private userLinks: Map<string, UserLink> = new Map();
   private channelMappings: Map<string, ChannelMapping> = new Map();
+
+  // Rich Presence tracking
+  private tsConnectedUsers: number = 0;
+  private dcConnectedUsers: number = 0;
+  private tsChannelsActive: number = 0;
+  private tsConnected: boolean = false;
+  private dcConnected: boolean = false;
 
   constructor() {
     super();
@@ -134,6 +143,20 @@ export class BridgeCore extends EventEmitter {
       this.healthCheckTimer = null;
     }
 
+    // Disconnect clients
+    if (this.teamspeakClient) {
+      await this.teamspeakClient.disconnect();
+      this.tsConnected = false;
+      this.tsConnectedUsers = 0;
+    }
+    if (this.discordClient) {
+      await this.discordClient.disconnect();
+      this.dcConnected = false;
+      this.dcConnectedUsers = 0;
+    }
+
+    this.emitRichPresenceUpdate();
+
     // Stop components
     await this.shutdownComponents();
 
@@ -159,18 +182,68 @@ export class BridgeCore extends EventEmitter {
 
   private async initializeTeamSpeak(): Promise<void> {
     logger.info('Initializing TeamSpeak client...');
-    // TODO: Implement TeamSpeak client connection
-    // this.teamspeakClient = new TeamSpeakClient(this.config.teamspeak);
-    // await this.teamspeakClient.connect();
-    // this.setupTeamSpeakEvents();
+    this.teamspeakClient = createTS3Client({
+      host: this.config.teamspeak.host,
+      queryPort: this.config.teamspeak.queryPort,
+      username: this.config.teamspeak.username,
+      password: this.config.teamspeak.password,
+      serverId: this.config.teamspeak.serverId,
+      nickname: this.config.teamspeak.nickname,
+      reconnectInterval: this.config.teamspeak.reconnectInterval,
+      maxReconnectAttempts: this.config.teamspeak.maxReconnectAttempts,
+    });
+
+    // Forward TS events to bridge core
+    const { tsEventEmitter } = await import('../teamspeak/events/index.js');
+    tsEventEmitter.on('client:connect', (event) => this.emit('ts:client:connect', event));
+    tsEventEmitter.on('client:disconnect', (event) => this.emit('ts:client:disconnect', event));
+    tsEventEmitter.on('client:move', (event) => this.emit('ts:client:move', event));
+    tsEventEmitter.on('client:talk', (event) => this.emit('ts:client:talk', event));
+    tsEventEmitter.on('chat:message', (event) => this.emit('ts:chat:message', event));
+
+    await this.teamspeakClient.connect();
+    this.tsConnected = true;
+    this.tsConnectedUsers = this.teamspeakClient.getTSClients?.()?.length || 0;
+    this.emitRichPresenceUpdate();
+    logger.info('TeamSpeak client connected');
   }
 
   private async initializeDiscord(): Promise<void> {
     logger.info('Initializing Discord client...');
-    // TODO: Implement Discord client connection
-    // this.discordClient = new DiscordClient(this.config.discord);
-    // await this.discordClient.login();
-    // this.setupDiscordEvents();
+    this.discordClient = createDiscordClient({
+      token: this.config.discord.token,
+      clientId: this.config.discord.clientId,
+      guildId: this.config.discord.guildId,
+      intents: this.config.discord.intents,
+    });
+
+    // Register built-in commands
+    const { registerBuiltinCommands } = await import('../discord/index.js');
+    registerBuiltinCommands(this.discordClient);
+
+    // Forward Discord events to bridge core
+    this.discordClient.on('messageCreate', (message) => this.emit('discord:messageCreate', message));
+    this.discordClient.on('messageUpdate', (oldMsg, newMsg) => this.emit('discord:messageUpdate', oldMsg, newMsg));
+    this.discordClient.on('messageDelete', (message) => this.emit('discord:messageDelete', message));
+    this.discordClient.on('voiceStateUpdate', (oldState, newState) => this.emit('discord:voiceStateUpdate', oldState, newState));
+    this.discordClient.on('reactionAdd', (reaction, user) => this.emit('discord:reactionAdd', reaction, user));
+    this.discordClient.on('reactionRemove', (reaction, user) => this.emit('discord:reactionRemove', reaction, user));
+    // Forward Reaction Role events
+    this.discordClient.on('reactionrole:add', (data) => this.emit('reactionrole:add', data));
+    this.discordClient.on('reactionrole:remove', (data) => this.emit('reactionrole:remove', data));
+    // Forward Rich Presence updates
+    this.discordClient.on('richpresence:update', (data) => this.emit('richpresence:update', data));
+    this.discordClient.on('threadCreate', (thread) => this.emit('discord:threadCreate', thread));
+    this.discordClient.on('threadUpdate', (oldThread, newThread) => this.emit('discord:threadUpdate', oldThread, newThread));
+    this.discordClient.on('threadDelete', (thread) => this.emit('discord:threadDelete', thread));
+    this.discordClient.on('guildMemberAdd', (member) => this.emit('discord:guildMemberAdd', member));
+    this.discordClient.on('guildMemberRemove', (member) => this.emit('discord:guildMemberRemove', member));
+    this.discordClient.on('guildMemberUpdate', (oldMember, newMember) => this.emit('discord:guildMemberUpdate', oldMember, newMember));
+
+    await this.discordClient.connect();
+    this.dcConnected = true;
+    this.emitRichPresenceUpdate();
+    logger.info('Discord client connected');
   }
 
   private async initializeAudioPipeline(): Promise<void> {
@@ -218,6 +291,8 @@ export class BridgeCore extends EventEmitter {
     const client = event.payload as TSClient;
 
     this.connectedTSClients.set(client.clid, client);
+    this.tsConnectedUsers = this.connectedTSClients.size;
+    this.tsConnected = this.tsConnectedUsers > 0;
     logger.debug('TeamSpeak client connected', { clid: client.clid, nickname: client.clientNickname });
 
     // Check for linked Discord user
@@ -227,6 +302,7 @@ export class BridgeCore extends EventEmitter {
     }
 
     this.emit('user.joined', { platform: 'teamspeak', client });
+    this.emitRichPresenceUpdate();
   }
 
   private handleTSClientDisconnect(event: BridgeEvents): void {
@@ -235,12 +311,15 @@ export class BridgeCore extends EventEmitter {
 
     const client = this.connectedTSClients.get(clid);
     this.connectedTSClients.delete(clid);
+    this.tsConnectedUsers = this.connectedTSClients.size;
+    this.tsConnected = this.tsConnectedUsers > 0;
 
     logger.debug('TeamSpeak client disconnected', { clid, reasonId, reasonMsg });
 
     if (client) {
       this.emit('user.left', { platform: 'teamspeak', client, reason: reasonMsg });
     }
+    this.emitRichPresenceUpdate();
   }
 
   private handleTSClientMove(event: BridgeEvents): void {
@@ -297,6 +376,8 @@ export class BridgeCore extends EventEmitter {
     if (newState?.channelId && !oldState?.channelId) {
       // User joined voice channel
       this.connectedDiscordUsers.set(userId, newState);
+      this.dcConnectedUsers = this.connectedDiscordUsers.size;
+      this.dcConnected = this.dcConnectedUsers > 0;
       logger.debug('Discord user joined voice', { userId, channelId: newState.channelId });
 
       // Check for linked TS user
@@ -306,12 +387,16 @@ export class BridgeCore extends EventEmitter {
       }
 
       this.emit('user.joined', { platform: 'discord', userId, channelId: newState.channelId });
+      this.emitRichPresenceUpdate();
     } else if (!newState?.channelId && oldState?.channelId) {
       // User left voice channel
       this.connectedDiscordUsers.delete(userId);
+      this.dcConnectedUsers = this.connectedDiscordUsers.size;
+      this.dcConnected = this.dcConnectedUsers > 0;
       logger.debug('Discord user left voice', { userId });
 
       this.emit('user.left', { platform: 'discord', userId });
+      this.emitRichPresenceUpdate();
     } else if (newState?.channelId && oldState?.channelId && newState.channelId !== oldState.channelId) {
       // User moved channels
       logger.debug('Discord user moved voice', { userId, from: oldState.channelId, to: newState.channelId });
@@ -557,6 +642,19 @@ export class BridgeCore extends EventEmitter {
       // @ts-ignore - discordClient has updateRichPresence method
       this.discordClient.updateRichPresence(data);
     }
+  }
+
+  /**
+   * Emit rich presence update with current bridge state
+   */
+  private emitRichPresenceUpdate(): void {
+    this.emit('richpresence:update', {
+      tsConnectedUsers: this.tsConnectedUsers,
+      dcConnectedUsers: this.dcConnectedUsers,
+      tsChannelsActive: this.tsChannelsActive,
+      tsConnected: this.tsConnected,
+      dcConnected: this.dcConnected,
+    });
   }
 
   // ========================================================================

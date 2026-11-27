@@ -56,6 +56,7 @@ async function execute(interaction): Promise<void> {
         );
       }
       break;
+    }  // closing brace for case 'status'
 
     case 'channels': {
       if (bridge?.bridgeCore?.getChannelMappings) {
@@ -70,6 +71,7 @@ async function execute(interaction): Promise<void> {
         }
       }
       break;
+    }  // closing brace for case 'channels'
 
     case 'users': {
       if (bridge?.bridgeCore?.getUserLinks) {
@@ -87,8 +89,8 @@ async function execute(interaction): Promise<void> {
         }
       }
       break;
-    }
-  }
+    }  // closing brace for case 'users'
+  }  // closing brace for switch statement
 
   await interaction.reply({ embeds: [embed], ephemeral: true });
 }
@@ -96,7 +98,4 @@ async function execute(interaction): Promise<void> {
 export const bridgeCommand = {
   data: data.toJSON(),
   execute,
-} satisfies {
-  data: ReturnType<typeof SlashCommandBuilder.prototype.toJSON>;
-  execute: (interaction: any) => Promise<void>;
 };
