@@ -36,7 +36,7 @@
 | Phase | Name | Progress | Tasks | Status |
 |-------|------|----------|-------|--------|
 | **0** | Foundation & Setup | `▰▰▰▰▰▰▰▰▰▰` **100%** | 8/8 | ✅ **COMPLETE** |
-| **1** | TeamSpeak Integration | `▰▱▱▱▱▱▱▱▱▱` **15%** | 1/7 | 🔄 **In Progress** |
+| **1** | TeamSpeak Integration | `▰▰▰▰▰▱▱▱▱▱` **71%** | 5/7 | 🔄 **In Progress** |
 | **2** | Discord Integration | `▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
 | **3** | Audio Pipeline | `▱▱▱▱▱▱▱▱▱▱` **0%** | 0/7 | ⏳ Planned |
 | **4** | Chat Synchronization | `▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
@@ -47,7 +47,7 @@
 
 <div align="center">
 
-**Overall:** `▰▰▱▱▱▱▱▱▱▱` **17%** (9/53 tasks)
+**Overall:** `▰▰▱▱▱▱▱▱▱▱` **25%** (13/53 tasks)
 
 </div>
 
@@ -74,7 +74,13 @@
 
 | Task | Status |
 |------|--------|
-| TS3 Query Connection - Stable TCP with auto-reconnect | 🔄 **In Progress** |
+| TS3 Query Connection - Stable TCP with auto-reconnect | ✅ **Done** |
+| TS5 WebSocket Support - Modern WebSocket-based connection | ⏳ Pending |
+| Event System - Comprehensive event handling | ✅ **Done** |
+| Channel Management - List, create, move, delete | ✅ **Done** |
+| User Management - Client info, groups, permissions, bans | ✅ **Done** |
+| File Transfer - Handle TeamSpeak file transfers | ⏳ Pending |
+| Permission System - Server group / channel group mapping | ✅ **Done** |
 | TS5 WebSocket Support - Modern WebSocket-based connection | ⏳ Pending |
 | Event System - Comprehensive event handling | ⏳ Pending |
 | Channel Management - List, create, move, delete | ⏳ Pending |
