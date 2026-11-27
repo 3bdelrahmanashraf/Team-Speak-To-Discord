@@ -43,7 +43,7 @@
 |-------|------|----------|-------|--------|
 | **0** | Foundation & Setup | `▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰` **100%** | 8/8 | ✅ **COMPLETE** |
 | **1** | TeamSpeak Integration | `▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰` **100%** | 7/7 | ✅ **COMPLETE** |
-| **2** | Discord Integration | `▰▰▰▰▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **67%** | 4/6 | 🔄 **In Progress** |
+| **2** | Discord Integration | `▰▰▰▰▰▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **83%** | 5/6 | 🔄 **In Progress** |
 | **3** | Audio Pipeline | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/7 | ⏳ Planned |
 | **4** | Chat Synchronization | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
 | **5** | User & Permission Mgmt | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/7 | ⏳ Planned |
@@ -53,7 +53,7 @@
 
 <div align="center">
 
-**Overall:** `▰▰▰▰▰▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **32%** (19/59 tasks)
+**Overall:** `▰▰▰▰▰▰▱▱▱▱▱▱▱▱▱▱` **36%** (21/59 tasks)
 
 </div>
 
@@ -96,9 +96,9 @@
 |------|--------|
 | Bot Setup - Discord.js v14 with gateway intents | ✅ **Done** |
 | Slash Commands - Full command registration & handling | ✅ **Done** |
-| Voice Connection - Join/leave voice channels, Opus streaming | 🔄 **In Progress** |
-| Voice Connection - Join/leave voice channels, Opus streaming | 🔄 **In Progress** |
-| Text Synchronization - Bidirectional message relay with embeds | ⏳ Pending |
+| Voice Connection - Join/leave voice channels, Opus streaming | ✅ **Done** |
+| Text Synchronization - Bidirectional message relay with embeds | 🔄 **In Progress** |
+| Text Synchronization - Bidirectional message relay with embeds | 🔄 **In Progress** |
 | Thread Support - Map TS channels to Discord threads | ⏳ Pending |
 | Reaction Roles - Discord reactions → TS server groups | ⏳ Pending |
 | Rich Presence - Show TS status in Discord profile | ⏳ Pending |

@@ -6,8 +6,9 @@
 import { EventEmitter } from 'node:events';
 import { getConfig } from '../shared/config/index.js';
 import { createLogger } from '../shared/utils/logger.js';
-import { BridgeState, BridgeEvents, TSClient, TSChannel, DiscordVoiceState, UserLink, ChannelMapping } from '../shared/types/index.js';
+import { BridgeState, BridgeEvents, TSClient, TSChannel, DiscordVoiceState, UserLink, ChannelMapping, DiscordMessage } from '../shared/types/index.js';
 import { BridgeError, ConnectionError, TeamSpeakError, DiscordError } from '../shared/utils/errors.js';
+import { ChatSync } from './chat/index.js';
 
 const logger = createLogger('bridge:core');
 
@@ -23,7 +24,7 @@ export class BridgeCore extends EventEmitter {
   private teamspeakClient: unknown = null;
   private discordClient: unknown = null;
   private audioPipeline: unknown = null;
-  private chatSync: unknown = null;
+  private chatSync: ChatSync | null = null;
   private userManager: unknown = null;
 
   // State tracking
@@ -35,21 +36,21 @@ export class BridgeCore extends EventEmitter {
   constructor() {
     super();
     this.maxReconnectAttempts = config.bridge.maxConcurrentUsers; // Using maxConcurrentUsers as fallback
+
+    // Initialize chat sync
+    this.chatSync = new ChatSync(this.config.chat);
+
+    // Connect chat sync events
+    this.chatSync.on('ts:message', this.handleTSChatMessageFromSync.bind(this));
+    this.chatSync.on('dc:message', this.handleDiscordMessageFromSync.bind(this));
+    this.chatSync.on('send:discord', this.handleSendToDiscord.bind(this));
+    this.chatSync.on('send:teamspeak', this.handleSendToTeamSpeak.bind(this));
+    this.chatSync.on('edit:discord', this.handleDiscordEdit.bind(this));
+    this.chatSync.on('delete:discord', this.handleDiscordDelete.bind(this));
+    this.chatSync.on('edit:teamspeak', this.handleTSEdit.bind(this));
+    this.chatSync.on('delete:teamspeak', this.handleTSDelete.bind(this));
+
     this.setupEventHandlers();
-  }
-
-  private setupEventHandlers(): void {
-    // Forward events from components
-    this.on('ts.client.connect', this.handleTSClientConnect.bind(this));
-    this.on('ts.client.disconnect', this.handleTSClientDisconnect.bind(this));
-    this.on('ts.client.move', this.handleTSClientMove.bind(this));
-    this.on('ts.client.talk', this.handleTSClientTalk.bind(this));
-    this.on('ts.chat.message', this.handleTSChatMessage.bind(this));
-
-    this.on('discord.voiceStateUpdate', this.handleDiscordVoiceStateUpdate.bind(this));
-    this.on('discord.messageCreate', this.handleDiscordMessageCreate.bind(this));
-    this.on('discord.messageUpdate', this.handleDiscordMessageUpdate.bind(this));
-    this.on('discord.messageDelete', this.handleDiscordMessageDelete.bind(this));
   }
 
   /**
@@ -165,8 +166,11 @@ export class BridgeCore extends EventEmitter {
 
   private async initializeChatSync(): Promise<void> {
     logger.info('Initializing chat synchronization...');
-    // TODO: Implement chat sync
-    // this.chatSync = new ChatSync(this.config.chat, this.channelMappings);
+    // ChatSync already initialized in constructor
+    if (this.chatSync) {
+      this.chatSync.setChannelMappings(this.channelMappings);
+      logger.info('Chat synchronization initialized');
+    }
   }
 
   private async initializeUserManager(): Promise<void> {
@@ -259,14 +263,8 @@ export class BridgeCore extends EventEmitter {
     const client = this.connectedTSClients.get(clid);
     if (client) {
       logger.debug('TeamSpeak chat message', { clid, message: message.substring(0, 50) });
-      // Forward to Discord
-      this.emit('chat.message', {
-        platform: 'teamspeak',
-        client,
-        message,
-        targetMode,
-        target,
-      });
+      // Forward to chat sync for processing
+      this.chatSync?.handleTSMessage(clid, message, client, targetMode, target);
     }
   }
 
@@ -314,17 +312,79 @@ export class BridgeCore extends EventEmitter {
     if (message.authorId === this.config.discord.clientId) return;
 
     logger.debug('Discord message created', { channelId: message.channelId, authorId: message.authorId });
-    this.emit('chat.message', { platform: 'discord', message });
+    // Forward to chat sync for processing
+    this.chatSync?.handleDiscordMessage({
+      id: message.id,
+      content: message.content,
+      authorId: message.authorId,
+      authorName: message.author?.username || 'Unknown',
+      channelId: message.channelId,
+      guildId: message.guildId,
+      timestamp: message.createdAt,
+      editedTimestamp: message.editedAt,
+      embeds: message.embeds,
+      attachments: message.attachments,
+      mentions: message.mentions,
+      referencedMessage: message.reference?.messageId ? { id: message.reference.messageId } : null,
+    });
   }
 
   private handleDiscordMessageUpdate(event: BridgeEvents): void {
     if (event.type !== 'discord.messageUpdate') return;
-    this.emit('chat.message.edit', event.payload);
+    const message = event.payload;
+    this.chatSync?.handleDiscordMessageEdit({
+      id: message.id,
+      content: message.content,
+      channelId: message.channelId,
+    });
   }
 
   private handleDiscordMessageDelete(event: BridgeEvents): void {
     if (event.type !== 'discord.messageDelete') return;
-    this.emit('chat.message.delete', event.payload);
+    this.chatSync?.handleDiscordMessageDelete(event.payload);
+  }
+
+  // ========================================================================
+  // Chat Sync Event Handlers
+  // ========================================================================
+
+  private handleTSChatMessageFromSync(event: any): void {
+    const { clid, message, client, targetMode, target } = event.payload;
+    const client = this.connectedTSClients.get(clid);
+    if (client) {
+      this.chatSync?.handleTSMessage(clid, message, client, event.payload.targetMode, event.payload.target);
+    }
+  }
+
+  private handleDiscordMessageFromSync(event: any): void {
+    const message = event.payload;
+    this.chatSync?.handleDiscordMessage(message);
+  }
+
+  private handleSendToDiscord(data: { channelId: string; content: string }): void {
+    // Forward to Discord client via bot
+    this.emit('send:discord', data);
+  }
+
+  private handleSendToTeamSpeak(data: { channelId: string; content: string }): void {
+    // Forward to TeamSpeak client
+    this.emit('send:teamspeak', data);
+  }
+
+  private handleDiscordEdit(data: { dcMessageId: string; newContent: string }): void {
+    this.emit('edit:discord', data);
+  }
+
+  private handleDiscordDelete(data: { dcMessageId: string }): void {
+    this.emit('delete:discord', data);
+  }
+
+  private handleTSEdit(data: { tsMessageId: string; newContent: string }): void {
+    this.emit('edit:teamspeak', data);
+  }
+
+  private handleTSDelete(data: { tsMessageId: string }): void {
+    this.emit('delete:teamspeak', data);
   }
 
   // ========================================================================
@@ -428,16 +488,23 @@ export class BridgeCore extends EventEmitter {
    * Send message to TeamSpeak
    */
   async sendTSMessage(targetMode: number, target: string, message: string): Promise<void> {
-    // TODO: Implement via TeamSpeak client
-    logger.debug('Sending TS message', { targetMode, target, message });
+    if (this.teamspeakClient) {
+      // @ts-ignore
+      await this.teamspeakClient.sendMessage(targetMode, target, message);
+    } else {
+      logger.warn('TeamSpeak client not initialized');
+    }
   }
 
   /**
    * Send message to Discord
    */
   async sendDiscordMessage(channelId: string, content: string): Promise<void> {
-    // TODO: Implement via Discord client
-    logger.debug('Sending Discord message', { channelId, content });
+    if (this.discordClient) {
+      await this.discordClient.sendMessage(channelId, content);
+    } else {
+      logger.warn('Discord client not initialized');
+    }
   }
 
   /**
