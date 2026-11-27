@@ -23,15 +23,18 @@ Implement Discord.js v14 bot with gateway intents, slash commands, voice connect
 - Event forwarding to bridge core (messages, voice, reactions, threads, members)
 - Bot entry point integration (`src/bot/index.ts`)
 - **Discord credentials configured** in `.env` (gitignored)
+- **Voice Handler** (`src/discord/voice/handler.ts`) - Voice connection management, audio reception
+- **Voice Integration** in Discord client (`src/discord/client.ts`)
 
 ### In Progress
-- Voice Connection - Join/leave voice channels, Opus streaming
+- Voice Connection - Join/leave voice channels, Opus streaming (handler created, integration in progress)
 - Text Synchronization - Bidirectional message relay with embeds
 
 ### Related Files
 - `src/discord/client.ts` - Discord.js v14 client
 - `src/discord/types.ts` - Type definitions
 - `src/discord/commands/` - Slash commands (ping, bridge, link)
+- `src/discord/voice/handler.ts` - Voice connection handler
 - `src/discord/index.ts` - Module exports & command registration
 - `src/bot/index.ts` - Main entry point with both TS & Discord clients
 - `.env` - Discord credentials (gitignored)

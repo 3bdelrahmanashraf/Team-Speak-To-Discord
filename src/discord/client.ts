@@ -20,6 +20,7 @@ import type {
   AutocompleteContext,
 } from './types.js';
 import { tsEventEmitter } from '../teamspeak/events/index.js';
+import { createDiscordVoiceHandler, DiscordVoiceHandler } from './voice/handler.js';
 
 const logger = createLogger('discord:client');
 
@@ -48,13 +49,48 @@ export class DiscordClient extends EventEmitter {
   private reconnectAttempts: number = 0;
   private maxReconnectAttempts: number = 10;
   private reconnectInterval: number = 5000;
+  private voiceHandler: DiscordVoiceHandler;
 
   constructor(config: DiscordConfig) {
     super();
     this.config = config;
     this.rest = new REST({ version: '10' }).setToken(config.token);
     this.client = this.createClient();
+
+    // Initialize voice handler
+    this.voiceHandler = new DiscordVoiceHandler({
+      sampleRate: 48000,
+      channels: 2,
+      frameSize: 960,
+      bitrate: 64000,
+    });
+
+    // Forward voice events
+    this.voiceHandler.on('audio:received', (packet) => {
+      this.emit('discord:audio:received', packet);
+    });
+
+    this.voiceHandler.on('connection:state', (state) => {
+      this.emit('discord:voice:state', state);
+    });
+
+    this.voiceHandler.on('connection:ready', (connection) => {
+      this.emit('discord:voice:ready', connection);
+    });
+
+    this.voiceHandler.on('connection:closed', (guildId) => {
+      this.emit('discord:voice:disconnect', guildId);
+    });
+
+    this.voiceHandler.on('connection:error', (error) => {
+      this.emit('discord:voice:error', error);
+    });
+
     this.setupEventHandlers();
+  }
+
+  getVoiceHandler(): DiscordVoiceHandler {
+    return this.voiceHandler;
   }
 
   // ========================================================================
@@ -82,12 +118,11 @@ export class DiscordClient extends EventEmitter {
   }
 
   getVoiceConnectionState(guildId: string): VoiceConnectionState | null {
-    const connection = this.voiceConnections.get(guildId);
+    const connection = this.voiceHandler.getConnection(guildId);
     if (!connection) return null;
-    // Return basic state - actual implementation depends on voice adapter
     return {
-      connected: true,
-      channelId: '',
+      connected: this.voiceHandler.isConnected(guildId),
+      channelId: '', // Would need to track this
       guildId,
       selfDeaf: false,
       selfMute: false,
@@ -126,9 +161,7 @@ export class DiscordClient extends EventEmitter {
     this.isShuttingDown = true;
 
     // Disconnect all voice connections
-    for (const [guildId] of this.voiceConnections) {
-      await this.leaveVoiceChannel(guildId);
-    }
+    await this.voiceHandler.disconnectAll();
 
     // Destroy client
     this.client.destroy();
@@ -225,10 +258,8 @@ export class DiscordClient extends EventEmitter {
       throw new BridgeError(`Voice channel not found: ${channelId}`, 'CHANNEL_NOT_FOUND', 404);
     }
 
-    const voiceChannel = channel as VoiceChannel;
-
     // Check if already connected
-    const existing = this.voiceConnections.get(guildId);
+    const existing = this.voiceHandler.getConnection(guildId);
     if (existing) {
       logger.warn('Already connected to voice channel in guild', { guildId });
       return existing;
@@ -236,75 +267,25 @@ export class DiscordClient extends EventEmitter {
 
     logger.info('Joining voice channel', { guildId, channelId });
 
-    return new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        this.pendingVoiceConnections.delete(guildId);
-        reject(new BridgeError('Voice connection timeout', 'VOICE_TIMEOUT', 504));
-      }, 30000);
-
-      const pending: PendingVoiceConnection = { guildId, channelId, resolve, reject, timeout };
-      this.pendingVoiceConnections.set(guildId, pending);
-
-      // Join voice channel using Discord.js voice
-      try {
-        const { joinVoiceChannel } = require('@discordjs/voice');
-        const connection = joinVoiceChannel({
-          channelId: voiceChannel.id,
-          guildId: guild.id,
-          adapterCreator: guild.voiceAdapterCreator,
-          selfDeaf: false,
-          selfMute: false,
-        });
-
-        connection.on('stateChange', (oldState, newState) => {
-          logger.debug('Voice connection state change', { oldState: oldState.status, newState: newState.status });
-        });
-
-        connection.on('error', (error) => {
-          logger.error('Voice connection error', { error });
-          this.emit('voiceError', guildId, error);
-        });
-
-        connection.on('disconnect', () => {
-          logger.info('Voice connection disconnected', { guildId });
-          this.voiceConnections.delete(guildId);
-          this.emit('voiceDisconnect', guildId);
-        });
-
-        this.voiceConnections.set(guildId, connection);
-
-        const pendingConn = this.pendingVoiceConnections.get(guildId);
-        if (pendingConn) {
-          clearTimeout(pendingConn.timeout);
-          this.pendingVoiceConnections.delete(guildId);
-          pendingConn.resolve(connection);
-        }
-
-        resolve(connection);
-      } catch (error) {
-        const pendingConn = this.pendingVoiceConnections.get(guildId);
-        if (pendingConn) {
-          clearTimeout(pendingConn.timeout);
-          this.pendingVoiceConnections.delete(guildId);
-          pendingConn.reject(error);
-        }
-        reject(error);
-      }
-    });
-  }
-
-  async leaveVoiceChannel(guildId: string): Promise<void> {
-    const connection = this.voiceConnections.get(guildId);
-    if (connection) {
-      // @ts-ignore - destroy method exists on voice connection
-      connection.destroy();
-      this.voiceConnections.delete(guildId);
-      logger.info('Left voice channel', { guildId });
+    try {
+      const connection = await this.voiceHandler.joinChannel(guildId, channel);
+      return connection;
+    } catch (error) {
+      logger.error('Failed to join voice channel', { error, guildId, channelId });
+      throw new BridgeError(`Failed to join voice channel: ${error instanceof Error ? error.message : 'Unknown error'}`, 'VOICE_JOIN_FAILED', 500);
     }
   }
 
+  async leaveVoiceChannel(guildId: string): Promise<void> {
+    await this.voiceHandler.leaveChannel(guildId);
+  }
+
   getVoiceConnection(guildId: string): unknown | undefined {
-    return this.voiceConnections.get(guildId);
+    return this.voiceHandler.getConnection(guildId);
+  }
+
+  getVoiceHandler(): DiscordVoiceHandler {
+    return this.voiceHandler;
   }
 
   // ========================================================================
