@@ -43,7 +43,7 @@
 |-------|------|----------|-------|--------|
 | **0** | Foundation & Setup | `▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰` **100%** | 8/8 | ✅ **COMPLETE** |
 | **1** | TeamSpeak Integration | `▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰` **100%** | 7/7 | ✅ **COMPLETE** |
-| **2** | Discord Integration | `▰▰▰▰▰▰▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **86%** | 6/7 | 🔄 **In Progress** |
+| **2** | Discord Integration | `▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▱▱` **86%** | 6/7 | 🔄 **In Progress** |
 | **3** | Audio Pipeline | `▰▰▰▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **14%** | 0/7 | 🔄 **In Progress** |
 | **4** | Chat Synchronization | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
 | **5** | User & Permission Mgmt | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/7 | ⏳ Planned |
