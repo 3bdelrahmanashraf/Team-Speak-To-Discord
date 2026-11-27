@@ -1,4 +1,4 @@
-## Phase 2: Discord Integration ✅ **COMPLETE**
+## Phase 2: Discord Integration 🔄 **In Progress** (71%)
 
 ### Overview
 Implement Discord.js v14 bot with gateway intents, slash commands, voice connections, and text synchronization.
@@ -13,7 +13,7 @@ Implement Discord.js v14 bot with gateway intents, slash commands, voice connect
 - [ ] Rich Presence - Show TS status in Discord profile
 
 ### Status
-**COMPLETE** - 6/6 tasks done (100%)
+**IN PROGRESS** - 5/7 tasks done (71%)
 
 ### Completed
 - Discord.js v14 Client with all required intents (`src/discord/client.ts`)
@@ -36,6 +36,10 @@ Implement Discord.js v14 bot with gateway intents, slash commands, voice connect
   - Sync existing threads for a TS channel
   - Thread event handling in bridge core
 
+### Pending
+- Reaction Roles - Discord reactions → TS server groups
+- Rich Presence - Show TS status in Discord profile
+
 ### Related Files
 - `src/discord/client.ts` - Discord.js v14 client
 - `src/discord/types.ts` - Type definitions
@@ -49,7 +53,7 @@ Implement Discord.js v14 bot with gateway intents, slash commands, voice connect
 
 ### Progress Tracking
 - Started: 2026-11-27
-- Progress: 6/6 (100%)
+- Progress: 5/7 (71%)
 
 ### Dependencies
 - Phase 0: Foundation & Setup (complete)

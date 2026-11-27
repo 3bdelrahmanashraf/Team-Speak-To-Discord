@@ -43,8 +43,8 @@
 |-------|------|----------|-------|--------|
 | **0** | Foundation & Setup | `▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰` **100%** | 8/8 | ✅ **COMPLETE** |
 | **1** | TeamSpeak Integration | `▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰` **100%** | 7/7 | ✅ **COMPLETE** |
-| **2** | Discord Integration | `▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰` **100%** | 6/6 | ✅ **COMPLETE** |
-| **3** | Audio Pipeline | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/7 | ⏳ Planned |
+| **2** | Discord Integration | `▰▰▰▰▰▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **71%** | 5/7 | 🔄 **In Progress** |
+| **3** | Audio Pipeline | `▰▰▰▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **14%** | 0/7 | 🔄 **In Progress** |
 | **4** | Chat Synchronization | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
 | **5** | User & Permission Mgmt | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/7 | ⏳ Planned |
 | **6** | Web Dashboard | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
@@ -90,7 +90,7 @@
 
 ---
 
-### Phase 2: Discord Integration  ✅ **COMPLETE**
+### Phase 2: Discord Integration  🔄 **In Progress** (71%)
 
 | Task | Status |
 |------|--------|
@@ -104,11 +104,11 @@
 
 ---
 
-### Phase 3: Audio Pipeline  ⏳ **Planned**
+### Phase 3: Audio Pipeline  🔄 **In Progress** (14%)
 
 | Task | Status |
 |------|--------|
-| Opus Encoder/Decoder - High-quality audio processing | ⏳ Pending |
+| Opus Encoder/Decoder - High-quality audio processing | 🔄 **In Progress** |
 | Voice Activity Detection - Silero VAD integration | ⏳ Pending |
 | Noise Suppression - RNNoise / WebRTC NS integration | ⏳ Pending |
 | Adaptive Bitrate - Dynamic quality based on network | ⏳ Pending |
