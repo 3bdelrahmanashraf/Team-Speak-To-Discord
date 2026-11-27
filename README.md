@@ -48,12 +48,12 @@
 | **4** | Chat Synchronization | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
 | **5** | User & Permission Mgmt | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/7 | ⏳ Planned |
 | **6** | Web Dashboard | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
-| **7** | Advanced Features | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
+| **7** | Advanced Features | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/4 | ⏳ Planned |
 | **8** | Polish & Release | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
 
 <div align="center">
 
-**Overall:** `▰▰▰▰▰▰▱▱▱▱▱▱▱▱▱▱` **40%** (24/59 tasks)
+**Overall:** `▰▰▰▰▰▰▰▱▱▱▱▱▱▱▱▱▱▱▱▱` **36%** (20/55 tasks)
 
 </div>
 
