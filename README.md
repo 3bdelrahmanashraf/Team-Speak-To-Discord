@@ -43,7 +43,7 @@
 |-------|------|----------|-------|--------|
 | **0** | Foundation & Setup | `▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰` **100%** | 8/8 | ✅ **COMPLETE** |
 | **1** | TeamSpeak Integration | `▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰` **100%** | 7/7 | ✅ **COMPLETE** |
-| **2** | Discord Integration | `▰▰▰▰▰▰▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **100%** | 6/6 | ✅ **COMPLETE** |
+| **2** | Discord Integration | `▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰` **100%** | 6/6 | ✅ **COMPLETE** |
 | **3** | Audio Pipeline | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/7 | ⏳ Planned |
 | **4** | Chat Synchronization | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
 | **5** | User & Permission Mgmt | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/7 | ⏳ Planned |
@@ -166,8 +166,6 @@
 | Clustering - Horizontal scaling with Redis | ⏳ Pending |
 | Plugin System - Custom extensions via TypeScript | ⏳ Pending |
 | WebRTC Fallback - Browser-based audio for mobile | ⏳ Pending |
-| Mobile App Companion - React Native control app | ⏳ Pending |
-| AI Moderation - Toxicity detection, auto-moderation | ⏳ Pending |
 
 ---
 
