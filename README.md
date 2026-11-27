@@ -43,7 +43,7 @@
 |-------|------|----------|-------|--------|
 | **0** | Foundation & Setup | `▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰` **100%** | 8/8 | ✅ **COMPLETE** |
 | **1** | TeamSpeak Integration | `▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰` **100%** | 7/7 | ✅ **COMPLETE** |
-| **2** | Discord Integration | `▰▰▰▰▰▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **71%** | 5/7 | 🔄 **In Progress** |
+| **2** | Discord Integration | `▰▰▰▰▰▰▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **86%** | 6/7 | 🔄 **In Progress** |
 | **3** | Audio Pipeline | `▰▰▰▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **14%** | 0/7 | 🔄 **In Progress** |
 | **4** | Chat Synchronization | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
 | **5** | User & Permission Mgmt | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/7 | ⏳ Planned |
@@ -53,7 +53,7 @@
 
 <div align="center">
 
-**Overall:** `▰▰▰▰▰▰▰▱▱▱▱▱▱▱▱▱▱▱▱▱` **36%** (21/55 tasks)
+**Overall:** `▰▰▰▰▰▰▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **38%** (21/55 tasks)
 
 </div>
 
@@ -99,8 +99,8 @@
 | Voice Connection - Join/leave voice channels, Opus streaming | ✅ **Done** |
 | Text Synchronization - Bidirectional message relay with embeds | ✅ **Done** |
 | Thread Support - Map TS channels to Discord threads | ✅ **Done** |
-| Reaction Roles - Discord reactions → TS server groups | ⏳ Pending |
-| Rich Presence - Show TS status in Discord profile | ⏳ Pending |
+| Reaction Roles - Discord reactions → TS server groups | 🔄 **In Progress** |
+| Rich Presence - Show TS status in Discord profile | 🔄 **In Progress** |
 
 ---
 

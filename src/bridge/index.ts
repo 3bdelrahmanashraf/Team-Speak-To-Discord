@@ -58,6 +58,13 @@ export class BridgeCore extends EventEmitter {
     this.on('discord:threadUpdate', this.handleDiscordThreadUpdate.bind(this));
     this.on('discord:threadDelete', this.handleDiscordThreadDelete.bind(this));
 
+    // Reaction role events
+    this.on('reactionrole:add', this.handleReactionRoleAdd.bind(this));
+    this.on('reactionrole:remove', this.handleReactionRoleRemove.bind(this));
+
+    // Rich Presence events
+    this.on('richpresence:update', this.handleRichPresenceUpdate.bind(this));
+
     this.setupEventHandlers();
   }
 
@@ -440,6 +447,116 @@ export class BridgeCore extends EventEmitter {
     // Handle thread deletion in Discord
     logger.debug('Discord thread deleted', { threadId: event.thread.id });
     this.emit('thread:deleted', event);
+  }
+
+  // ========================================================================
+  // Reaction Role Event Handlers
+  // ========================================================================
+
+  private handleReactionRoleAdd(data: {
+    userId: string;
+    tsUniqueId: string;
+    tsGroupName: string;
+    emoji: string;
+    messageId: string;
+    channelId: string;
+  }): void {
+    logger.info('Reaction role add requested', data);
+
+    // Find the linked user
+    const link = this.findUserLinkByDiscord(data.userId);
+    if (!link) {
+      logger.warn('No linked user found for reaction role add', { userId: data.userId });
+      return;
+    }
+
+    // Find the TeamSpeak client
+    const tsClient = this.connectedTSClients.get(link.tsUniqueId);
+    if (!tsClient) {
+      logger.warn('TeamSpeak client not connected for reaction role', { tsUniqueId: link.tsUniqueId });
+      return;
+    }
+
+    // TODO: Implement actual TeamSpeak server group assignment
+    // This would require sending a command to the TeamSpeak server
+    logger.info('Reaction role add requested', {
+      userId: data.userId,
+      tsUniqueId: data.tsUniqueId,
+      tsGroupName: data.tsGroupName,
+      emoji: data.emoji,
+    });
+
+    // Emit event for TeamSpeak client to handle the actual group assignment
+    this.emit('ts:reactionrole:add', {
+      clid: this.getClientIdByUniqueId(data.tsUniqueId),
+      groupName: data.tsGroupName,
+    });
+  }
+
+  private handleReactionRoleRemove(data: {
+    userId: string;
+    tsUniqueId: string;
+    tsGroupName: string;
+    emoji: string;
+    messageId: string;
+    channelId: string;
+  }): void {
+    logger.info('Reaction role remove requested', data);
+
+    // Find the linked user
+    const link = this.findUserLinkByDiscord(data.userId);
+    if (!link) {
+      logger.warn('No linked user found for reaction role remove', { userId: data.userId });
+      return;
+    }
+
+    // Find the TeamSpeak client
+    const tsClient = this.connectedTSClients.get(link.tsUniqueId);
+    if (!tsClient) {
+      logger.warn('TeamSpeak client not connected for reaction role remove', { tsUniqueId: link.tsUniqueId });
+      return;
+    }
+
+    // TODO: Implement actual TeamSpeak server group removal
+    logger.info('Reaction role remove requested', {
+      userId: data.userId,
+      tsUniqueId: data.tsUniqueId,
+      tsGroupName: data.tsGroupName,
+      emoji: data.emoji,
+    });
+
+    // Emit event for TeamSpeak client to handle the actual group removal
+    this.emit('ts:reactionrole:remove', {
+      clid: this.getClientIdByUniqueId(data.tsUniqueId),
+      groupName: data.tsGroupName,
+    });
+  }
+
+  private getClientIdByUniqueId(tsUniqueId: string): string | undefined {
+    for (const [clid, client] of this.connectedTSClients) {
+      if (client.clientUniqueIdentifier === tsUniqueId) {
+        return clid;
+      }
+    }
+    return undefined;
+  }
+
+  // ========================================================================
+  // Rich Presence Event Handlers
+  // ========================================================================
+
+  private handleRichPresenceUpdate(data: {
+    tsConnectedUsers?: number;
+    dcConnectedUsers?: number;
+    tsChannelsActive?: number;
+    tsConnected?: boolean;
+    dcConnected?: boolean;
+  }): void {
+    // Update Discord client's rich presence
+    if (this.discordClient) {
+      // @ts-ignore - discordClient has updateRichPresence method
+      this.discordClient.updateRichPresence(data);
+    }
   }
 
   // ========================================================================

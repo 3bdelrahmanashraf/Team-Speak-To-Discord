@@ -28,8 +28,9 @@ import { pingCommand } from './commands/ping.js';
 import { bridgeCommand } from './commands/bridge.js';
 import { linkCommand } from './commands/link.js';
 import { threadCommand } from './commands/thread.js';
+import { reactionRoleCommand } from './commands/reactionrole.js';
 
-export const builtinCommands = [pingCommand, bridgeCommand, linkCommand, threadCommand];
+export const builtinCommands = [pingCommand, bridgeCommand, linkCommand, threadCommand, reactionRoleCommand];
 
 /**
  * Register all built-in commands with a DiscordClient instance

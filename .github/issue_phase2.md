@@ -18,7 +18,7 @@ Implement Discord.js v14 bot with gateway intents, slash commands, voice connect
 ### Completed
 - Discord.js v14 Client with all required intents (`src/discord/client.ts`)
 - Slash Command framework with autocomplete support
-- Built-in commands: `/ping`, `/bridge status/channels/users`, `/link account/remove/info`, `/thread create/remove/list/sync`
+- Built-in commands: `/ping`, `/bridge status/channels/users`, `/link account/remove/info`, `/thread create/remove/list/sync`, `/reactionrole add/remove/list/sync`
 - Command registration (guild & global)
 - Event forwarding to bridge core (messages, voice, reactions, threads, members)
 - Bot entry point integration (`src/bot/index.ts`)
@@ -36,18 +36,18 @@ Implement Discord.js v14 bot with gateway intents, slash commands, voice connect
   - Sync existing threads for a TS channel
   - Thread event handling in bridge core
 
-### Pending
-- Reaction Roles - Discord reactions → TS server groups
-- Rich Presence - Show TS status in Discord profile
+### In Progress
+- Reaction Roles - Discord reactions → TS server groups (command implemented, bridge integration pending)
+- Rich Presence - Show TS status in Discord profile (methods implemented, bridge integration pending)
 
 ### Related Files
-- `src/discord/client.ts` - Discord.js v14 client
+- `src/discord/client.ts` - Discord.js v14 client with Rich Presence & Reaction Role methods
 - `src/discord/types.ts` - Type definitions
-- `src/discord/commands/` - Slash commands (ping, bridge, link, thread)
+- `src/discord/commands/` - Slash commands (ping, bridge, link, thread, reactionrole)
 - `src/discord/voice/handler.ts` - Voice connection handler
 - `src/discord/index.ts` - Module exports & command registration
 - `src/bridge/chat/sync.ts` - Chat synchronization module
-- `src/bridge/index.ts` - Bridge core with chat sync & thread integration
+- `src/bridge/index.ts` - Bridge core with chat sync, thread & reaction role integration
 - `src/bot/index.ts` - Main entry point with both TS & Discord clients
 - `.env` - Discord credentials (gitignored)
 

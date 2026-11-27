@@ -3,7 +3,7 @@
  * Discord.js v14 bot with gateway intents, slash commands, and voice support
  */
 
-import { Client, GatewayIntentBits, Partials, Collection, Events, REST, Routes, ActivityType, VoiceChannel, VoiceState, Guild, GuildMember, Message, TextChannel, ThreadChannel, Interaction, CommandInteraction, AutocompleteInteraction } from 'discord.js';
+import { Client, GatewayIntentBits, Partials, Collection, Events, REST, Routes, ActivityType, VoiceChannel, VoiceState, Guild, GuildMember, Message, TextChannel, ThreadChannel, Interaction, CommandInteraction, AutocompleteInteraction, MessageReaction, User, PartialMessageReaction } from 'discord.js';
 import { EventEmitter } from 'node:events';
 import { createLogger } from '../../shared/utils/logger.js';
 import { BridgeError, ConnectionError, DiscordError } from '../../shared/utils/errors.js';
@@ -23,6 +23,16 @@ import { tsEventEmitter } from '../teamspeak/events/index.js';
 import { createDiscordVoiceHandler, DiscordVoiceHandler } from './voice/handler.js';
 
 const logger = createLogger('discord:client');
+
+// Reaction role mapping type
+interface ReactionRoleMapping {
+  id: string;
+  channelId: string;
+  messageId: string;
+  emoji: string;
+  tsGroupName: string;
+  description?: string;
+}
 
 interface CommandHandlerMap {
   [commandName: string]: SlashCommandHandler;
@@ -50,6 +60,15 @@ export class DiscordClient extends EventEmitter {
   private maxReconnectAttempts: number = 10;
   private reconnectInterval: number = 5000;
   private voiceHandler: DiscordVoiceHandler;
+
+  // Reaction role mappings
+  private reactionRoleMappings: Map<string, ReactionRoleMapping> = new Map();
+
+  // Rich Presence state
+  private richPresenceEnabled: boolean = false;
+  private tsConnectedUsers: number = 0;
+  private dcConnectedUsers: number = 0;
+  private tsChannelsActive: number = 0;
 
   constructor(config: DiscordConfig) {
     super();
@@ -334,6 +353,277 @@ export class DiscordClient extends EventEmitter {
 
   async clearPresence(): Promise<void> {
     await this.client.user.setPresence({ activities: [], status: 'online' });
+    this.richPresenceEnabled = false;
+  }
+
+  // ========================================================================
+  // Rich Presence Methods
+  // ========================================================================
+
+  /**
+   * Enable and update Rich Presence based on TeamSpeak/Discord bridge status
+   */
+  async updateRichPresence(data: {
+    tsConnectedUsers?: number;
+    dcConnectedUsers?: number;
+    tsChannelsActive?: number;
+    tsConnected?: boolean;
+    dcConnected?: boolean;
+  }): Promise<void> {
+    if (!this.richPresenceEnabled) {
+      this.richPresenceEnabled = true;
+    }
+
+    // Update internal state
+    if (data.tsConnectedUsers !== undefined) this.tsConnectedUsers = data.tsConnectedUsers;
+    if (data.dcConnectedUsers !== undefined) this.dcConnectedUsers = data.dcConnectedUsers;
+    if (data.tsChannelsActive !== undefined) this.tsChannelsActive = data.tsChannelsActive;
+
+    const tsConnected = data.tsConnected ?? true;
+    const dcConnected = data.dcConnected ?? true;
+
+    // Build activity status
+    const activities = [];
+
+    // Main bridge status activity
+    const bridgeStatus = tsConnected && dcConnected ? '🟢 Online' : '🔴 Offline';
+    const userCount = this.tsConnectedUsers + this.dcConnectedUsers;
+    const channelInfo = this.tsChannelsActive > 0 ? ` | ${this.tsChannelsActive} TS channels` : '';
+
+    activities.push({
+      name: `${bridgeStatus} | ${userCount} users${channelInfo}`,
+      type: ActivityType.Watching,
+    });
+
+    // Add TeamSpeak-specific activity if connected
+    if (tsConnected) {
+      activities.push({
+        name: `${this.tsConnectedUsers} users on TeamSpeak`,
+        type: ActivityType.Listening,
+      });
+    }
+
+    // Add Discord-specific activity if connected
+    if (dcConnected) {
+      activities.push({
+        name: `${this.dcConnectedUsers} users on Discord`,
+        type: ActivityType.Listening,
+      });
+    }
+
+    try {
+      await this.client.user.setPresence({
+        activities,
+        status: tsConnected && dcConnected ? 'online' : 'idle',
+        afk: false,
+      });
+
+      this.richPresenceEnabled = true;
+      logger.debug('Rich Presence updated', {
+        tsConnectedUsers: this.tsConnectedUsers,
+        dcConnectedUsers: this.dcConnectedUsers,
+        tsChannelsActive: this.tsChannelsActive,
+        tsConnected,
+        dcConnected,
+      });
+    } catch (error) {
+      logger.error('Failed to update Rich Presence', { error });
+    }
+  }
+
+  /**
+   * Disable Rich Presence
+   */
+  async disableRichPresence(): Promise<void> {
+    await this.clearPresence();
+  }
+
+  /**
+   * Get current Rich Presence status
+   */
+  getRichPresenceStatus(): { enabled: boolean; tsUsers: number; dcUsers: number; tsChannels: number } {
+    return {
+      enabled: this.richPresenceEnabled,
+      tsUsers: this.tsConnectedUsers,
+      dcUsers: this.dcConnectedUsers,
+      tsChannels: this.tsChannelsActive,
+    };
+  }
+
+  // ========================================================================
+  // Reaction Role Methods
+  // ========================================================================
+
+  /**
+   * Add a reaction role mapping
+   */
+  addReactionRoleMapping(mapping: ReactionRoleMapping): void {
+    const key = `${mapping.channelId}:${mapping.messageId}:${mapping.emoji}`;
+    this.reactionRoleMappings.set(key, mapping);
+    logger.debug('Added reaction role mapping', { key, mapping });
+  }
+
+  /**
+   * Remove a reaction role mapping
+   */
+  removeReactionRoleMapping(channelId: string, messageId: string, emoji: string): boolean {
+    const key = `${channelId}:${messageId}:${emoji}`;
+    const deleted = this.reactionRoleMappings.delete(key);
+    if (deleted) {
+      logger.debug('Removed reaction role mapping', { key });
+    }
+    return deleted;
+  }
+
+  /**
+   * Get a reaction role mapping
+   */
+  getReactionRoleMapping(channelId: string, messageId: string, emoji: string): ReactionRoleMapping | undefined {
+    const key = `${channelId}:${messageId}:${emoji}`;
+    return this.reactionRoleMappings.get(key);
+  }
+
+  /**
+   * Get all reaction role mappings for a message
+   */
+  getReactionRoleMappingsForMessage(channelId: string, messageId: string): ReactionRoleMapping[] {
+    const results: ReactionRoleMapping[] = [];
+    const prefix = `${channelId}:${messageId}:`;
+    for (const [key, mapping] of this.reactionRoleMappings) {
+      if (key.startsWith(prefix)) {
+        results.push(mapping);
+      }
+    }
+    return results;
+  }
+
+  /**
+   * Get all reaction role mappings
+   */
+  getAllReactionRoleMappings(): ReactionRoleMapping[] {
+    return Array.from(this.reactionRoleMappings.values());
+  }
+
+  // ========================================================================
+  // Reaction Role Event Handlers
+  // ========================================================================
+
+  /**
+   * Handle reaction role addition
+   */
+  private async handleReactionRoleAdd(reaction: MessageReaction, user: User): Promise<void> {
+    try {
+      // Ignore bots
+      if (user.bot) return;
+
+      // Partial reaction - fetch if needed
+      if (reaction.partial) {
+        await reaction.fetch();
+      }
+
+      const channelId = reaction.message.channelId;
+      const messageId = reaction.message.id;
+      const emoji = reaction.emoji.name || reaction.emoji.id || '';
+
+      // Find matching mapping
+      const mapping = this.getReactionRoleMapping(channelId, reaction.message.id, reaction.emoji.name || reaction.emoji.id || '');
+      if (!mapping) return;
+
+      // Get the guild
+      const guild = this.client.guilds.cache.get(this.config.guildId);
+      if (!guild) return;
+
+      // Get the member
+      const member = await guild.members.fetch(user.id).catch(() => null);
+      if (!member) return;
+
+      // Check if the TeamSpeak bridge is available
+      const bridge = (global as any).bridgeInstance;
+      if (!bridge?.bridgeCore) return;
+
+      // Check if user is linked to a TeamSpeak account
+      const links = bridge.bridgeCore.getUserLinks();
+      const userLink = links.find(l => l.discordId === user.id);
+      if (!userLink) return;
+
+      // Emit event for bridge core to handle the TS server group assignment
+      this.emit('reactionrole:add', {
+        userId: user.id,
+        tsUniqueId: userLink.tsUniqueId,
+        tsGroupName: mapping.tsGroupName,
+        emoji: reaction.emoji.name || reaction.emoji.id || '',
+        messageId: reaction.message.id,
+        channelId: reaction.message.channelId,
+      });
+
+      logger.info('Reaction role added', {
+        userId: user.id,
+        emoji: reaction.emoji.name || reaction.emoji.id,
+        tsGroupName: mapping.tsGroupName,
+        tsUniqueId: userLink.tsUniqueId,
+      });
+    } catch (error) {
+      logger.error('Error handling reaction role add', { error });
+    }
+  }
+
+  /**
+   * Handle reaction role removal
+   */
+  private async handleReactionRoleRemove(reaction: MessageReaction, user: User): Promise<void> {
+    try {
+      // Ignore bots
+      if (user.bot) return;
+
+      // Partial reaction - fetch if needed
+      if (reaction.partial) {
+        await reaction.fetch();
+      }
+
+      const channelId = reaction.message.channelId;
+      const messageId = reaction.message.id;
+      const emoji = reaction.emoji.name || reaction.emoji.id || '';
+
+      // Find matching mapping
+      const mapping = this.getReactionRoleMapping(channelId, reaction.message.id, reaction.emoji.name || reaction.emoji.id || '');
+      if (!mapping) return;
+
+      // Get the guild
+      const guild = this.client.guilds.cache.get(this.config.guildId);
+      if (!guild) return;
+
+      // Get the member
+      const member = await guild.members.fetch(user.id).catch(() => null);
+      if (!member) return;
+
+      // Check if the TeamSpeak bridge is available
+      const bridge = (global as any).bridgeInstance;
+      if (!bridge?.bridgeCore) return;
+
+      // Check if user is linked to a TeamSpeak account
+      const links = bridge.bridgeCore.getUserLinks();
+      const userLink = links.find(l => l.discordId === user.id);
+      if (!userLink) return;
+
+      // Emit event for bridge core to handle the TS server group removal
+      this.emit('reactionrole:remove', {
+        userId: user.id,
+        tsUniqueId: userLink.tsUniqueId,
+        tsGroupName: mapping.tsGroupName,
+        emoji: reaction.emoji.name || reaction.emoji.id || '',
+        messageId: reaction.message.id,
+        channelId: reaction.message.channelId,
+      });
+
+      logger.info('Reaction role removed', {
+        userId: user.id,
+        emoji: reaction.emoji.name || reaction.emoji.id,
+        tsGroupName: mapping.tsGroupName,
+        tsUniqueId: userLink.tsUniqueId,
+      });
+    } catch (error) {
+      logger.error('Error handling reaction role remove', { error });
+    }
   }
 
   // ========================================================================
@@ -534,14 +824,20 @@ export class DiscordClient extends EventEmitter {
     // Reaction Events (for reaction roles)
     // =======================================================================
 
-    this.client.on(Events.MessageReactionAdd, (reaction, user) => {
+    this.client.on(Events.MessageReactionAdd, async (reaction, user) => {
       if (user.bot) return;
       this.emit('reactionAdd', reaction, user);
+
+      // Handle reaction role addition
+      await this.handleReactionRoleAdd(reaction, user);
     });
 
-    this.client.on(Events.MessageReactionRemove, (reaction, user) => {
+    this.client.on(Events.MessageReactionRemove, async (reaction, user) => {
       if (user.bot) return;
       this.emit('reactionRemove', reaction, user);
+
+      // Handle reaction role removal
+      await this.handleReactionRoleRemove(reaction, user);
     });
 
     // =======================================================================
