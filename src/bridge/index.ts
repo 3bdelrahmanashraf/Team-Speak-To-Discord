@@ -6,11 +6,12 @@
 import { EventEmitter } from 'node:events';
 import { getConfig } from '../shared/config/index.js';
 import { createLogger } from '../shared/utils/logger.js';
-import { BridgeState, BridgeEvents, TSClient, TSChannel, DiscordVoiceState, UserLink, ChannelMapping, DiscordMessage } from '../shared/types/index.js';
+import { BridgeState, BridgeEvents, TSClient, TSChannel, DiscordVoiceState, UserLink, ChannelMapping, DiscordMessage, AudioConfig } from '../shared/types/index.js';
 import { BridgeError, ConnectionError, TeamSpeakError, DiscordError } from '../shared/utils/errors.js';
 import { ChatSync } from './chat/index.js';
 import { createTS3Client, TS3QueryClient } from '../teamspeak/ts3/client.js';
 import { createDiscordClient, DiscordClient } from '../discord/client.js';
+import { AudioPipeline, createAudioPipeline, AudioPipelineConfig } from './audio/index.js';
 
 const logger = createLogger('bridge:core');
 
@@ -25,7 +26,7 @@ export class BridgeCore extends EventEmitter {
   // Component references (to be initialized)
   private teamspeakClient: TS3QueryClient | null = null;
   private discordClient: DiscordClient | null = null;
-  private audioPipeline: unknown = null;
+  private audioPipeline: AudioPipeline | null = null;
   private chatSync: ChatSync | null = null;
   private userManager: unknown = null;
 
@@ -73,6 +74,10 @@ export class BridgeCore extends EventEmitter {
 
     // Rich Presence events
     this.on('richpresence:update', this.handleRichPresenceUpdate.bind(this));
+
+    // Audio events
+    this.on('ts:audio:packet', this.handleTSAudioPacket.bind(this));
+    this.on('discord:audio:packet', this.handleDiscordAudioPacket.bind(this));
 
     this.setupEventHandlers();
   }
@@ -141,6 +146,14 @@ export class BridgeCore extends EventEmitter {
     if (this.healthCheckTimer) {
       clearInterval(this.healthCheckTimer);
       this.healthCheckTimer = null;
+    }
+
+    // Stop audio pipeline
+    if (this.audioPipeline) {
+      this.audioPipeline.stopPlayback();
+      this.audioPipeline.destroy();
+      this.audioPipeline = null;
+      logger.info('Audio pipeline stopped');
     }
 
     // Disconnect clients
@@ -248,8 +261,75 @@ export class BridgeCore extends EventEmitter {
 
   private async initializeAudioPipeline(): Promise<void> {
     logger.info('Initializing audio pipeline...');
-    // TODO: Implement audio pipeline
-    // this.audioPipeline = new AudioPipeline(this.config.audio);
+    try {
+      const audioConfig: AudioPipelineConfig = {
+        sampleRate: this.config.audio.sampleRate,
+        frameSize: this.config.audio.frameSize,
+        channels: this.config.audio.channels,
+        bitrate: this.config.audio.bitrate,
+        opus: {
+          application: this.config.audio.opusApplication,
+          fec: this.config.audio.vadEnabled, // Using vadEnabled as FEC flag
+          dtx: true,
+          complexity: 10,
+          packetLoss: 0,
+        },
+        vad: {
+          enabled: this.config.audio.vadEnabled,
+          threshold: this.config.audio.vadThreshold,
+          minSpeechFrames: 3,
+          minSilenceFrames: 10,
+          adaptive: true,
+        },
+        noiseSuppression: {
+          enabled: this.config.audio.noiseSuppressionEnabled,
+          mode: 'auto',
+          strength: this.config.audio.noiseSuppressionLevel,
+        },
+        adaptiveBitrate: {
+          enabled: this.config.audio.adaptiveBitrate,
+          minBitrate: 16000,
+          maxBitrate: 128000,
+          initialBitrate: this.config.audio.bitrate,
+        },
+        mixer: {
+          enabled: true,
+          maxInputs: 50,
+          agc: true,
+          limiter: true,
+          vadAware: true,
+          maxActiveSpeakers: 3,
+        },
+        jitterBuffer: {
+          enabled: true,
+          minBufferSize: 3,
+          maxBufferSize: 50,
+          targetBufferSize: Math.max(3, Math.floor(this.config.audio.jitterBufferMs / 20)),
+          adaptive: true,
+          concealment: true,
+        },
+        recording: {
+          enabled: false,
+          format: 'wav',
+          multiTrack: true,
+          maxFileSize: 100 * 1024 * 1024,
+          maxDuration: 3600,
+        },
+      };
+
+      this.audioPipeline = await createAudioPipeline(audioConfig);
+
+      // Start playback for Discord output
+      this.audioPipeline.startPlayback();
+
+      logger.info('Audio pipeline initialized successfully');
+
+      // Start audio processing loop
+      this.startAudioProcessing();
+    } catch (error) {
+      logger.error('Failed to initialize audio pipeline', { error: String(error) });
+      // Don't throw - audio pipeline is optional for basic functionality
+    }
   }
 
   private async initializeChatSync(): Promise<void> {
@@ -347,6 +427,109 @@ export class BridgeCore extends EventEmitter {
       } else {
         this.emit('audio.stop', { platform: 'teamspeak', client });
       }
+    }
+  }
+
+  /**
+   * Handle TeamSpeak audio packet from a client
+   */
+  private handleTSAudioPacket(event: BridgeEvents): void {
+    if (event.type !== 'ts.audio.packet') return;
+    const { clid, pcm, sequence, timestamp } = event.payload as {
+      clid: string;
+      pcm: Float32Array;
+      sequence?: number;
+      timestamp?: number;
+    };
+
+    const client = this.connectedTSClients.get(clid);
+    if (!client) return;
+
+    // Process through audio pipeline
+    if (this.audioPipeline) {
+      this.audioPipeline.processTSFrame(clid, pcm, sequence, timestamp).catch(error => {
+        logger.error('TS audio frame processing failed', { clid, error: String(error) });
+      });
+    }
+
+    // Record packet for network monitoring
+    if (sequence !== undefined) {
+      this.audioPipeline?.recordPacket(sequence, timestamp ?? Date.now());
+    }
+  }
+
+  /**
+   * Handle Discord audio packet from a user
+   */
+  private handleDiscordAudioPacket(event: BridgeEvents): void {
+    if (event.type !== 'discord.audio.packet') return;
+    const { userId, opusData, sequence } = event.payload as {
+      userId: string;
+      opusData: Uint8Array;
+      sequence?: number;
+    };
+
+    // Process through audio pipeline
+    if (this.audioPipeline) {
+      this.audioPipeline.processDiscordFrame(userId, opusData, sequence).catch(error => {
+        logger.error('Discord audio frame processing failed', { userId, error: String(error) });
+      });
+    }
+
+    // Record packet for network monitoring
+    if (sequence !== undefined) {
+      this.audioPipeline?.recordPacket(sequence, Date.now());
+    }
+  }
+
+  /**
+   * Process mixed audio output and send to Discord
+   * Called periodically from audio processing loop
+   */
+  async processAudioOutput(): Promise<void> {
+    if (!this.audioPipeline || !this.discordClient) return;
+
+    try {
+      // Get VAD results for active speakers
+      const vadResults = new Map<string, { isSpeech: boolean; probability: number }>();
+
+      // Get mixed audio
+      const mixedAudio = this.audioPipeline.getMixedOutput(vadResults);
+      if (!mixedAudio) return;
+
+      // Encode to Opus
+      const opusData = this.audioPipeline.encodeToOpus(mixedAudio);
+
+      // Send to Discord voice channel
+      const voiceHandler = this.discordClient.getVoiceHandler();
+      if (voiceHandler && voiceHandler.isConnected?.(this.config.discord.guildId)) {
+        // The voice handler would handle sending Opus frames
+        // This is a placeholder - actual implementation depends on voice handler API
+        voiceHandler.sendOpusFrame?.(opusData);
+      }
+
+      // Update network stats from audio pipeline
+      const audioStats = this.audioPipeline.getStats();
+      if (audioStats?.networkMonitor) {
+        this.audioPipeline.updateNetworkStats(audioStats.networkMonitor);
+      }
+    } catch (error) {
+      logger.error('Audio output processing failed', { error: String(error) });
+    }
+  }
+
+  /**
+   * Start audio processing loop
+   */
+  startAudioProcessing(): void {
+    if (this.audioPipeline) {
+      // Audio processing happens at frame rate (50fps = 20ms)
+      setInterval(() => {
+        this.processAudioOutput().catch(error => {
+          logger.error('Audio processing loop error', { error: String(error) });
+        });
+      }, 20);
+      logger.info('Audio processing loop started');
     }
   }
 
