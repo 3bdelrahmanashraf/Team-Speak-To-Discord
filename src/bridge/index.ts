@@ -50,6 +50,14 @@ export class BridgeCore extends EventEmitter {
     this.chatSync.on('edit:teamspeak', this.handleTSEdit.bind(this));
     this.chatSync.on('delete:teamspeak', this.handleTSDelete.bind(this));
 
+    // Thread events
+    this.on('thread:mapping:create', this.handleThreadMappingCreate.bind(this));
+    this.on('thread:mapping:remove', this.handleThreadMappingRemove.bind(this));
+    this.on('thread:sync', this.handleThreadSync.bind(this));
+    this.on('discord:threadCreate', this.handleDiscordThreadCreate.bind(this));
+    this.on('discord:threadUpdate', this.handleDiscordThreadUpdate.bind(this));
+    this.on('discord:threadDelete', this.handleDiscordThreadDelete.bind(this));
+
     this.setupEventHandlers();
   }
 
@@ -385,6 +393,53 @@ export class BridgeCore extends EventEmitter {
 
   private handleTSDelete(data: { tsMessageId: string }): void {
     this.emit('delete:teamspeak', data);
+  }
+
+  // ========================================================================
+  // Thread Event Handlers
+  // ========================================================================
+
+  private handleThreadMappingCreate(data: { tsChannelId: string; discordChannelId: string; type: string; threadNamePrefix: string }): void {
+    const mapping = {
+      tsChannelId: data.tsChannelId,
+      discordChannelId: data.discordChannelId,
+      type: 'thread' as const,
+      syncMessages: true,
+      syncUsers: true,
+      syncPermissions: false,
+      threadNamePrefix: data.threadNamePrefix,
+    };
+    this.channelMappings.set(data.tsChannelId, mapping);
+    logger.info('Thread mapping created', { tsChannelId: data.tsChannelId, discordChannelId: data.discordChannelId });
+  }
+
+  private handleThreadMappingRemove(data: { tsChannelId: string }): void {
+    this.channelMappings.delete(data.tsChannelId);
+    logger.info('Thread mapping removed', { tsChannelId: data.tsChannelId });
+  }
+
+  private async handleThreadSync(data: { tsChannelId: string }): Promise<void> {
+    logger.info('Thread sync requested', { tsChannelId: data.tsChannelId });
+    // TODO: Implement thread sync - create/update Discord threads for TS channel activity
+    this.emit('thread:sync:complete', { tsChannelId: data.tsChannelId });
+  }
+
+  private handleDiscordThreadCreate(event: { thread: any }): void {
+    // Handle new thread created in Discord
+    logger.debug('Discord thread created', { threadId: event.thread.id, parentId: event.thread.parentId });
+    this.emit('thread:created', event);
+  }
+
+  private handleDiscordThreadUpdate(event: { oldThread: any; newThread: any }): void {
+    // Handle thread updates in Discord
+    logger.debug('Discord thread updated', { threadId: event.newThread.id });
+    this.emit('thread:updated', event);
+  }
+
+  private handleDiscordThreadDelete(event: { thread: any }): void {
+    // Handle thread deletion in Discord
+    logger.debug('Discord thread deleted', { threadId: event.thread.id });
+    this.emit('thread:deleted', event);
   }
 
   // ========================================================================

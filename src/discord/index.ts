@@ -27,8 +27,9 @@ export function createDiscordClient(config: DiscordConfig): DiscordClient {
 import { pingCommand } from './commands/ping.js';
 import { bridgeCommand } from './commands/bridge.js';
 import { linkCommand } from './commands/link.js';
+import { threadCommand } from './commands/thread.js';
 
-export const builtinCommands = [pingCommand, bridgeCommand, linkCommand];
+export const builtinCommands = [pingCommand, bridgeCommand, linkCommand, threadCommand];
 
 /**
  * Register all built-in commands with a DiscordClient instance
