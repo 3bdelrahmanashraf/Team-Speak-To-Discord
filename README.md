@@ -1,5 +1,9 @@
 # Team Speak To Discord
 
+<div align="center">
+  <img src="docs/assets/Banner.png" alt="TeamSpeak to Discord Bridge" width="100%" />
+</div>
+
 > A high-performance, feature-rich bridge that seamlessly connects **TeamSpeak 3/5** with **Discord**, enabling bidirectional audio streaming, text chat synchronization, and advanced community management features.
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
