@@ -13,7 +13,7 @@ Implement Discord.js v14 bot with gateway intents, slash commands, voice connect
 - [ ] Rich Presence - Show TS status in Discord profile
 
 ### Status
-**IN PROGRESS** - 3/7 tasks done (43%)
+**IN PROGRESS** - 4/6 tasks done (67%)
 
 ### Completed
 - Discord.js v14 Client with all required intents (`src/discord/client.ts`)
@@ -41,7 +41,7 @@ Implement Discord.js v14 bot with gateway intents, slash commands, voice connect
 
 ### Progress Tracking
 - Started: 2026-11-27
-- Progress: 3/7 (43%)
+- Progress: 4/6 (67%)
 
 ### Dependencies
 - Phase 0: Foundation & Setup (complete)
