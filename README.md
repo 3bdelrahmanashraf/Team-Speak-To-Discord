@@ -36,7 +36,7 @@
 | Phase | Name | Progress | Tasks | Status |
 |-------|------|----------|-------|--------|
 | **0** | Foundation & Setup | `▰▰▰▰▰▰▰▰▰▰` **100%** | 8/8 | ✅ **COMPLETE** |
-| **1** | TeamSpeak Integration | `▱▱▱▱▱▱▱▱▱▱` **0%** | 0/7 | ⏳ Planned |
+| **1** | TeamSpeak Integration | `▰▱▱▱▱▱▱▱▱▱` **15%** | 1/7 | 🔄 **In Progress** |
 | **2** | Discord Integration | `▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
 | **3** | Audio Pipeline | `▱▱▱▱▱▱▱▱▱▱` **0%** | 0/7 | ⏳ Planned |
 | **4** | Chat Synchronization | `▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
@@ -47,7 +47,7 @@
 
 <div align="center">
 
-**Overall:** `▰▰▰▰▰▰▰▰▱▱▱▱▱▱▱▱▱▱▱▱` **11%** (8/53 tasks)
+**Overall:** `▰▰▱▱▱▱▱▱▱▱` **17%** (9/53 tasks)
 
 </div>
 
@@ -70,11 +70,11 @@
 
 ---
 
-### Phase 1: TeamSpeak Integration  ⏳ **Planned**
+### Phase 1: TeamSpeak Integration  🔄 **In Progress**
 
 | Task | Status |
 |------|--------|
-| TS3 Query Connection - Stable TCP with auto-reconnect | ⏳ Pending |
+| TS3 Query Connection - Stable TCP with auto-reconnect | 🔄 **In Progress** |
 | TS5 WebSocket Support - Modern WebSocket-based connection | ⏳ Pending |
 | Event System - Comprehensive event handling | ⏳ Pending |
 | Channel Management - List, create, move, delete | ⏳ Pending |
