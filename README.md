@@ -43,7 +43,7 @@
 |-------|------|----------|-------|--------|
 | **0** | Foundation & Setup | `▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰` **100%** | 8/8 | ✅ **COMPLETE** |
 | **1** | TeamSpeak Integration | `▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰` **100%** | 7/7 | ✅ **COMPLETE** |
-| **2** | Discord Integration | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
+| **2** | Discord Integration | `▰▰▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **33%** | 2/6 | 🔄 **In Progress** |
 | **3** | Audio Pipeline | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/7 | ⏳ Planned |
 | **4** | Chat Synchronization | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
 | **5** | User & Permission Mgmt | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/7 | ⏳ Planned |
@@ -53,7 +53,7 @@
 
 <div align="center">
 
-**Overall:** `▰▰▰▰▰▰▱▱▱▱▱▱▱▱▱▱` **33%** (17/53 tasks)
+**Overall:** `▰▰▰▰▰▰▱▱▱▱▱▱▱▱▱▱` **38%** (20/53 tasks)
 
 </div>
 
@@ -90,11 +90,12 @@
 
 ---
 
-### Phase 2: Discord Integration  ⏳ **Planned**
+### Phase 2: Discord Integration  🔄 **In Progress**
 
 | Task | Status |
 |------|--------|
-| Bot Setup - Discord.js v14 with gateway intents | ⏳ Pending |
+| Bot Setup - Discord.js v14 with gateway intents | ✅ **Done** |
+| Slash Commands - Full command registration & handling | 🔄 **In Progress** |
 | Slash Commands - Full command registration & handling | ⏳ Pending |
 | Voice Connection - Join/leave voice channels, Opus streaming | ⏳ Pending |
 | Text Synchronization - Bidirectional message relay with embeds | ⏳ Pending |
