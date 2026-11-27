@@ -35,19 +35,19 @@
 
 | Phase | Name | Progress | Tasks | Status |
 |-------|------|----------|-------|--------|
-| **0** | Foundation & Setup | `▰▰▰▰▰▰▰▰▰▰` **100%** | 8/8 | ✅ **COMPLETE** |
-| **1** | TeamSpeak Integration | `▰▰▰▰▰▰▰▰▰▰` **100%** | 7/7 | ✅ **COMPLETE** |
-| **2** | Discord Integration | `▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
-| **3** | Audio Pipeline | `▱▱▱▱▱▱▱▱▱▱` **0%** | 0/7 | ⏳ Planned |
-| **4** | Chat Synchronization | `▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
-| **5** | User & Permission Mgmt | `▱▱▱▱▱▱▱▱▱▱` **0%** | 0/7 | ⏳ Planned |
-| **6** | Web Dashboard | `▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
-| **7** | Advanced Features | `▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
-| **8** | Polish & Release | `▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
+| **0** | Foundation & Setup | `▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰` **100%** | 8/8 | ✅ **COMPLETE** |
+| **1** | TeamSpeak Integration | `▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰` **100%** | 7/7 | ✅ **COMPLETE** |
+| **2** | Discord Integration | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
+| **3** | Audio Pipeline | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/7 | ⏳ Planned |
+| **4** | Chat Synchronization | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
+| **5** | User & Permission Mgmt | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/7 | ⏳ Planned |
+| **6** | Web Dashboard | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
+| **7** | Advanced Features | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
+| **8** | Polish & Release | `▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱` **0%** | 0/6 | ⏳ Planned |
 
 <div align="center">
 
-**Overall:** `▰▰▰▰▱▱▱▱▱▱` **33%** (17/53 tasks)
+**Overall:** `▰▰▰▰▰▰▱▱▱▱▱▱▱▱▱▱` **33%** (17/53 tasks)
 
 </div>
 
