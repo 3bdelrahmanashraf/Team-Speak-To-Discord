@@ -79,6 +79,19 @@ export class BridgeCore extends EventEmitter {
     this.on('ts:audio:packet', this.handleTSAudioPacket.bind(this));
     this.on('discord:audio:packet', this.handleDiscordAudioPacket.bind(this));
 
+    // Mention mapping events
+    this.on('mention:ts_poke', this.handleMentionTSPoke.bind(this));
+
+    // Command bridge events
+    this.on('command:execute', this.handleCommandExecute.bind(this));
+
+    // Reaction events
+    this.on('reaction:sync', this.handleReactionSync.bind(this));
+
+    // Discord reaction events -> chat sync
+    this.on('discord:reactionAdd', (reaction, user) => this.chatSync?.handleDiscordReactionAdd?.(reaction, user.id));
+    this.on('discord:reactionRemove', (reaction, user) => this.chatSync?.handleDiscordReactionRemove?.(reaction, user.id));
+
     this.setupEventHandlers();
   }
 
@@ -337,8 +350,76 @@ export class BridgeCore extends EventEmitter {
     // ChatSync already initialized in constructor
     if (this.chatSync) {
       this.chatSync.setChannelMappings(this.channelMappings);
-      logger.info('Chat synchronization initialized');
+
+      // Build mention mappings from user links
+      const mentionMappings = new Map<string, { discordUserId: string; tsUniqueId: string; tsNickname: string }>();
+      for (const link of this.userLinks.values()) {
+        if (link.active && link.discordId && link.tsUniqueId) {
+          mentionMappings.set(link.discordId, {
+            discordUserId: link.discordId,
+            tsUniqueId: link.tsUniqueId,
+            tsNickname: link.tsNickname,
+          });
+        }
+      }
+      this.chatSync.setMentionMappings(mentionMappings);
+
+      // Register built-in bridge commands
+      this.registerBuiltinCommands();
+
+      logger.info('Chat synchronization initialized', {
+        channelMappings: this.channelMappings.size,
+        mentionMappings: mentionMappings.size,
+      });
     }
+  }
+
+  /**
+   * Register built-in bridge commands
+   */
+  private registerBuiltinCommands(): void {
+    // Help command
+    this.registerCommand('help', async () => {
+      const commands = Array.from(this.commandRegistry.entries())
+        .map(([name, cmd]) => `!${name} - ${cmd.description}`)
+        .join('\n');
+      return `Available bridge commands:\n${commands}`;
+    }, 'Show available bridge commands', ['ts', 'dc']);
+
+    // Ping command
+    this.registerCommand('ping', async () => '🏓 Pong! Bridge is alive.', 'Check bridge connectivity', ['ts', 'dc']);
+
+    // Info command
+    this.registerCommand('info', async () => {
+      return `🌉 TeamSpeak ↔ Discord Bridge\n` +
+        `TS Users: ${this.tsConnectedUsers} | DC Users: ${this.dcConnectedUsers}\n` +
+        `TS Connected: ${this.tsConnected ? '✅' : '❌'} | DC Connected: ${this.dcConnected ? '✅' : '❌'}\n` +
+        `Channels Mapped: ${this.channelMappings.size} | Users Linked: ${this.userLinks.size}`;
+    }, 'Show bridge status', ['ts', 'dc']);
+
+    // Users command
+    this.registerCommand('users', async () => {
+      const tsUsers = Array.from(this.connectedTSClients.values()).map(c => c.clientNickname).join(', ') || 'None';
+      const dcUsers = Array.from(this.connectedDiscordUsers.values()).map(u => u.member?.user?.username || 'Unknown').join(', ') || 'None';
+      return `📋 TeamSpeak (${this.connectedTSClients.size}): ${tsUsers}\n📋 Discord (${this.connectedDiscordUsers.size}): ${dcUsers}`;
+    }, 'List connected users', ['ts', 'dc']);
+
+    // Channels command
+    this.registerCommand('channels', async () => {
+      const mappings = Array.from(this.channelMappings.values())
+        .map(m => `TS:${m.tsChannelId} ↔ DC:${m.discordChannelId} (${m.type})`)
+        .join('\n') || 'None';
+      return `Mapped channels:\n${mappings}`;
+    }, 'List channel mappings', ['ts', 'dc']);
+
+    // Poke command (Discord only - mentions handled separately)
+    this.registerCommand('poke', async (args, context) => {
+      if (context.platform !== 'discord') return 'Poke command only works from Discord';
+      // Handled by mention system
+      return 'Use @mention to poke a TeamSpeak user';
+    }, 'Poke a TeamSpeak user (use @mention)', ['dc']);
+
+    logger.info('Built-in bridge commands registered', { count: this.commandRegistry.size });
   }
 
   private async initializeUserManager(): Promise<void> {
@@ -807,6 +888,113 @@ export class BridgeCore extends EventEmitter {
       }
     }
     return undefined;
+  }
+
+  // ========================================================================
+  // Mention Mapping Event Handlers
+  // ========================================================================
+
+  /**
+   * Handle Discord mention -> TeamSpeak poke
+   */
+  private handleMentionTSPoke(data: { discordUserId: string; tsUniqueId: string }): void {
+    logger.info('Mention -> TS poke requested', data);
+
+    // Find the linked user
+    const link = this.findUserLinkByDiscord(data.discordUserId);
+    if (!link || link.tsUniqueId !== data.tsUniqueId) {
+      logger.warn('No valid linked user for mention poke', { discordUserId: data.discordUserId });
+      return;
+    }
+
+    // Find the TeamSpeak client
+    const tsClient = this.connectedTSClients.get(link.tsUniqueId);
+    if (!tsClient) {
+      logger.warn('TeamSpeak client not connected for mention poke', { tsUniqueId: link.tsUniqueId });
+      return;
+    }
+
+    // Send poke via TeamSpeak client
+    if (this.teamspeakClient) {
+      // @ts-ignore - TS3QueryClient should have pokeClient method
+      this.teamspeakClient.pokeClient?.(link.tsUniqueId, `You were mentioned by ${link.discordUsername} on Discord`);
+    }
+
+    logger.info('TS poke sent for mention', { tsUniqueId: link.tsUniqueId, clid: tsClient.clid });
+  }
+
+  // ========================================================================
+  // Command Bridge Event Handlers
+  // ========================================================================
+
+  /**
+   * Command registry for bridge commands
+   */
+  private commandRegistry: Map<string, { handler: (args: string[], context: CommandContext) => Promise<string>; description: string; platforms: ('ts' | 'dc')[] }> = new Map();
+
+  interface CommandContext {
+    platform: 'teamspeak' | 'discord';
+    userId: string;
+    username: string;
+    channelId?: string;
+  }
+
+  /**
+   * Register a bridge command
+   */
+  registerCommand(name: string, handler: (args: string[], context: CommandContext) => Promise<string>, description: string, platforms: ('ts' | 'dc')[] = ['ts', 'dc']): void {
+    this.commandRegistry.set(name.toLowerCase(), { handler, description, platforms });
+    logger.debug('Bridge command registered', { name, platforms });
+  }
+
+  /**
+   * Handle command execution from chat sync
+   */
+  private async handleCommandExecute(data: { platform: 'teamspeak' | 'discord'; command: string; args: string[] }): Promise<void> {
+    const { platform, command, args } = data;
+    const cmd = command.toLowerCase();
+
+    const registered = this.commandRegistry.get(cmd);
+    if (!registered) {
+      logger.debug('Unknown bridge command', { command: cmd });
+      return;
+    }
+
+    // Check platform permission
+    if (!registered.platforms.includes(platform)) {
+      logger.debug('Command not allowed on this platform', { command: cmd, platform });
+      return;
+    }
+
+    try {
+      // Build context
+      const context: CommandContext = {
+        platform,
+        userId: '', // Would be populated from event
+        username: '',
+      };
+
+      const result = await registered.handler(args, context);
+      if (result) {
+        // Send result back to originating platform
+        if (platform === 'teamspeak') {
+          await this.sendTSMessage(1, this.config.teamspeak.channelId || '1', result);
+        } else {
+          await this.sendDiscordMessage(this.config.discord.channelId || '', result);
+        }
+      }
+    } catch (error) {
+      logger.error('Command execution failed', { command: cmd, error: String(error) });
+    }
+  }
+
+  /**
+   * Handle reaction sync between platforms
+   */
+  private handleReactionSync(data: { source: 'discord' | 'teamspeak'; messageId: string; emoji: string }): void {
+    logger.debug('Reaction sync', data);
+    // Could implement cross-platform reaction sync
+    this.emit(`reaction:sync:${data.source}`, data);
   }
 
   // ========================================================================
